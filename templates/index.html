@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!----===== CSS =====---->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+    <!----===== Boxicons CSS =====---->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <title>RAG</title>
+</head>
+<body>
+    <nav class="left-sidebar left-close right-close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="{{ url_for('static', filename='logo.png')}}" alt="logo">
+                </span>
+
+                <div class="text header-text">
+                    <span class="name">RAG Turku NLP</span>
+                    <span class="profession">Antonin Larvor</span>
+                </div>
+            </div>
+
+            
+        </header>
+        <i class='bx bx-chevron-right toggle'></i>
+        <div class="menu-bar">
+            <div class="menu">
+                <li class="nav-link">
+                    <i class='bx bx-home icon' ></i>
+                    <span class="text nav-text">Dashboard</span>
+                </li>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="chatbot">
+            <header>
+                <h3>Chat</h3>
+            </header>
+            <ul class="chatbox">
+                <li class="chat incoming">
+                    <span class="material-symbols-outlined"><i class='bx bxs-message-dots'></i></span>
+                    <p>Hi there <br>How can I help you today?</p>
+                </li>
+            </ul>
+            <form class="chat-input" id="message-area">
+                <textarea type="text" name="msg" placeholder="Enter a message..." autocomplete="off" class="chat-text" required></textarea>
+                <button type="submit" id="send-btn" class="input-group-text send_btn"><i class='bx bx-send' ></i></button>
+            </form>
+        </div>
+    </main>
+
+    <aside class="right-sidebar right-close left-close">
+        <i class='bx bx-chevron-right toggle-right'></i>
+        <div class="context">
+            <div class="border">
+                <li class="context-title">
+                    <span class="text right-sidebar-text">Context</span>
+                    <i class='bx bx-book-open icon'></i>
+                </li>
+                <div class="right-sidebar-box">
+                    <div class="right-sidebar-text-container">
+                        <p class="context-text">No context yet...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="blank"></div>
+        <div class="source">
+            <div class="border">
+                <li class="source-title">
+                    <span class="text right-sidebar-text">Source</span>
+                    <i class='bx bx-bookmarks icon'></i>
+                </li>
+                <div class="right-sidebar-box">
+                    <div class="right-sidebar-text-container">
+                        <p class="source-text">No source yet...Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi laboriosam, accusamus sapiente, aperiam, modi quisquam ut velit dolorem quae ab repellendus ratione ipsam numquam? Harum, ad perferendis. Non, ratione. Architecto! Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloribus architecto labore fugit, ab aperiam a excepturi quisquam, quidem est dolorem nobis nihil dolore, modi assumenda repellendus reprehenderit voluptatum aliquam adipisci. Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero aperiam eos tenetur laudantium incidunt. Maxime in nemo, incidunt mollitia tempore quas aperiam laboriosam voluptatem. Aliquam neque molestias illum veritatis dolorum! Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vitae exercitationem cupiditate, excepturi officiis ipsa sequi cumque, consequuntur natus praesentium officia at maxime in tempore eos consequatur expedita laudantium eligendi repellat!</p> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Inclusion de jQuery depuis le CDN de Google -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
+</body>
+</html>

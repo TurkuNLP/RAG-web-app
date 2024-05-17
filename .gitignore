@@ -1,0 +1,18 @@
+# Fichiers de configuration
+.env
+
+# Répertoires de cache
+__pycache__/
+chroma/
+ship_chroma/
+test_chroma/
+
+# Répertoires de données
+data/
+ship_data/
+test_data/
+
+# Autres fichiers ou répertoires à ignorer
+node_modules/
+*.log
+*.pyc
