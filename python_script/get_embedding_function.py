@@ -1,5 +1,3 @@
-from parameters import *
-
 def get_embedding_function(model = "voyage"):
     if model == "sentence-transformers/all-mpnet-base-v2":
         from langchain.embeddings.huggingface import HuggingFaceEmbeddings

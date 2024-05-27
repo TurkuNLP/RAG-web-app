@@ -101,7 +101,7 @@ $(document).ready(function() {
                 msg: userMessage,
             },
             type: "POST",
-            url: "/seus/get",
+            url: "/get",
         }).done(function(data) {
             //var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
             //$("#messageFormeight").append($.parseHTML(botHtml));
@@ -133,5 +133,23 @@ $(document).ready(function() {
     });
 });
 
+async function fetchDocuments() {
+    const response = await fetch('../data/documents/russian_data_clean/');
+    const documents = await response.json();
+    const listElement = document.getElementById('document-list');
+
+    documents.forEach(doc => {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = doc.url;
+        link.textContent = doc.name;
+        link.download = doc.name;  // pour activer le téléchargement
+        listItem.appendChild(link);
+        listElement.appendChild(listItem);
+    });
+}
+
+// Charger la liste des documents au chargement de la page
+window.onload = fetchDocuments;
 
 //sendBtn.addEventListener("click", handleChat);

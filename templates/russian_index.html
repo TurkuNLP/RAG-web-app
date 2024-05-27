@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!----===== CSS =====---->
-    <link rel="stylesheet" type="text/css" href="seus/{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='russian_style.css')}}">
     <!----===== Boxicons CSS =====---->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -16,12 +16,12 @@
         <header>
             <div class="image-text">
                 <span class="image">
-                    <img src="seus/{{ url_for('static', filename='seuslogo.jpeg')}}" alt="logo">
+                    <img src="{{ url_for('static', filename='logo.png')}}" alt="logo">
                 </span>
 
                 <div class="text header-text">
-                    <span class="name">SEUS</span>
-                    <span class="profession">Smart European <br>Shipbuilding</span>
+                    <span class="name">RAG</span>
+                    <span class="profession">Antonin LARVOR</span>
                 </div>
             </div>
         </header>
@@ -32,6 +32,7 @@
                     <i class='bx bx-home icon' ></i>
                     <span class="text nav-text">Dashboard</span>
                 </li>
+                <ul class="document-list"></ul>
             </div>
         </div>
     </nav>
@@ -88,7 +89,7 @@
     <!-- Inclusion de jQuery depuis le CDN de Google -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script src="seus/{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='russian_script.js') }}"></script>
     
 </body>
 </html>

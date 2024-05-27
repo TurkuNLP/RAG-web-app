@@ -8,7 +8,7 @@ from transformers import (
 
 from langchain.llms import HuggingFacePipeline
 
-from parameters import *
+from parameters import LLM_MODEL
 
 global_model = None
 

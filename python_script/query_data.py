@@ -4,7 +4,7 @@ from langchain.prompts import ChatPromptTemplate
 from get_embedding_function import get_embedding_function
 from get_llm_function import get_llm_function
 from populate_database import find_chroma_path
-from parameters import *
+from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
 
 
 def query_rag(query_text: str):

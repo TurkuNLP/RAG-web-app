@@ -1,14 +1,17 @@
 import argparse
 import os
 import shutil
-
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from langchain.vectorstores.chroma import Chroma
+from llama_index.core import SimpleDirectoryReader
 
-from parameters import *
+from parameters import DATA_PATH, CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
 from get_embedding_function import get_embedding_function
+
+
+
 
 def main():
     # Check if the database should be cleared (using the --clear flag).
@@ -24,11 +27,21 @@ def main():
     chunks = split_documents(documents)
     add_to_chroma(chunks)
 
-
 def load_documents():
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    return document_loader.load()
+    langchain_document_loader = PyPDFDirectoryLoader(DATA_PATH)
+    langchain_documents = langchain_document_loader.load()
+    llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
+    llama_documents = llama_document_loader.load_data()
+    documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
+    print(len(langchain_documents), len(llama_documents), len(documents))
+    return documents
 
+def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
+    langchain_docs = []
+    for doc in documents:
+        metadata = {"source" : doc.metadata["file_name"], "page" : "N/A"}
+        langchain_docs.append(Document(page_content=doc.text, metadata=metadata))
+    return langchain_docs
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
@@ -43,7 +56,7 @@ def split_documents(documents: list[Document]):
 def add_to_chroma(chunks: list[Document]):
     # Load the existing database.
     db = Chroma(
-        persist_directory=find_chroma_path(EMBEDDING_NAME,CHROMA_ROOT_PATH), embedding_function=get_embedding_function(EMBEDDING_NAME)
+        persist_directory=find_chroma_path(EMBEDDING_MODEL,CHROMA_ROOT_PATH), embedding_function=get_embedding_function(EMBEDDING_MODEL)
     )
 
     # Calculate Page IDs.
@@ -79,8 +92,8 @@ def calculate_chunk_ids(chunks):
 
     for chunk in chunks:
         source = chunk.metadata.get("source")
-        page = chunk.metadata.get("page")
-        current_page_id = f"{source}:{page}"
+        page = str(chunk.metadata.get("page"))
+        current_page_id = f"{source}:page={page}"
 
         # If the page ID is the same as the last one, increment the index.
         if current_page_id == last_page_id:

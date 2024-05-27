@@ -1,15 +1,25 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'python_script'))
+
+from parameters import load_api_keys,load_config
 from flask import Flask, render_template, request, jsonify
-from query_data import query_rag
 from random import randint
 
-app = Flask(__name__)
+DATA_PATH = None
+CHROMA_ROOT_PATH = None
+EMBEDDING_MODEL = None
+LLM_MODEL = None
+PROMPT_TEMPLATE = None
 
-@app.route("/")
+seus_app = Flask(__name__)
+
+@seus_app.route("/")
 def index():
     return render_template('index.html')
 
 
-@app.route("/get", methods=["POST"])
+@seus_app.route("/get", methods=["POST"])
 def chat():
     msg = request.form.get("msg","")
     input = msg
@@ -27,4 +37,7 @@ def get_Chat_response(text):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    load_api_keys()
+    load_config('seus')
+    from query_data import query_rag
+    seus_app.run(port=6666,debug=True)

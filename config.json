@@ -1,0 +1,24 @@
+{
+    "default": {
+        "data_path": "data/documents",
+        "chroma_root_path": "data/chroma",
+        "embedding_model": "voyage-law-2",
+        "llm_model": "gpt-3.5-turbo",
+        "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nAnswer the question based on the above context: {question}"
+    },
+    "seus": {
+      "data_path": "data/documents/ship_data",
+      "chroma_root_path": "data/chroma/ship_chroma",
+      "embedding_model": "voyage-law-2",
+      "llm_model": "gpt-3.5-turbo",
+      "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nAnswer the question based on the above context: {question}"
+    },
+    "russian": {
+      "data_path": "data/documents/russian_data_clean",
+      "chroma_root_path": "data/chroma/russian_data_clean_chroma",
+      "embedding_model": "voyage-law-2",
+      "llm_model": "gpt-3.5-turbo",
+      "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nPlease provide your answer to the question: {question}"
+    }
+  }
+  
