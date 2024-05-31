@@ -18,7 +18,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth > 768) {
         rightSidebar.classList.toggle("right-close");
         leftSidebar.classList.toggle("right-close");
+        rightSidebar.classList.toggle("left-close");
+        leftSidebar.classList.toggle("left-close");
     }
+    fetchDocuments;
 });
 
 window.addEventListener("resize", function() {
@@ -68,11 +71,6 @@ const createChatLi = (message, className) => {
     return chatLi;
 };
 
-const printContext = (contextText) => {
-    context.textContent.length();
-    console.log(length);
-};
-
 const handleChat = () => {
     userMessage = chatInput.value.trim();
     console.log(userMessage)
@@ -101,17 +99,19 @@ $(document).ready(function() {
                 msg: userMessage,
             },
             type: "POST",
-            url: "/get",
+            url: "/arch-en/get",
         }).done(function(data) {
-            //var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
-            //$("#messageFormeight").append($.parseHTML(botHtml));
             chatBox.appendChild(createChatLi(data.response, "incoming"));
             chatBox.scrollTo(0, chatBox.scrollHeight);
             context.innerHTML = "";
             source.innerHTML = "";
             
-            context.innerHTML = data.context.replace(/\n/g,"<br>");
-
+            let counter = 1;
+            data.context.forEach(function(ctx){
+                context.innerHTML += "Chunk " + counter + " :<br><br>" + ctx.replace(/\n/g,"<br>") + "<br><br>";
+                counter++;
+            })
+            
             data.source.forEach(function(src) {
                 source.innerHTML += src + "<br>";
             });
@@ -133,8 +133,9 @@ $(document).ready(function() {
     });
 });
 
+// Function to get documents from server
 async function fetchDocuments() {
-    const response = await fetch('../data/documents/russian_data_clean/');
+    const response = await fetch('/arch-en/documents');
     const documents = await response.json();
     const listElement = document.getElementById('document-list');
 
@@ -143,13 +144,26 @@ async function fetchDocuments() {
         const link = document.createElement('a');
         link.href = doc.url;
         link.textContent = doc.name;
-        link.download = doc.name;  // pour activer le téléchargement
+        link.title = doc.name;
+        link.target = "_blank";
+        
+        const icon = document.createElement('img');
+        icon.classList.add('icon');
+        switch (doc.extension) {
+            case 'pdf':
+                icon.src = 'arch-en/static/document-pdf.svg';
+                break;
+
+            case 'docs':
+                icon.src = 'static/microsoft-word.svg';
+                break;                        
+        
+            default:
+                icon.src = 'arch-ru/static/microsoft-word.svg';
+        }
+        listItem.appendChild(icon);
         listItem.appendChild(link);
         listElement.appendChild(listItem);
     });
 }
-
-// Charger la liste des documents au chargement de la page
 window.onload = fetchDocuments;
-
-//sendBtn.addEventListener("click", handleChat);

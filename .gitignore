@@ -1,14 +1,16 @@
-# Fichiers de configuration
+# Config files
 .env
 
-# Répertoires de cache
+# Cache folders
 __pycache__/
+python_script/__pycache__/
 
-# Répertoires de données
+# Datas folders
 data/
-chroma/
 
-# Autres fichiers ou répertoires à ignorer
+# Other files or folders to ignore
 node_modules/
 *.log
 *.pyc
+python_script/cleanpdf.py
+python_script/docxtopdf.py

@@ -75,6 +75,7 @@ const printContext = (contextText) => {
     console.log(length);
 };
 
+
 const handleChat = () => {
     userMessage = chatInput.value.trim();
     console.log(userMessage)
@@ -103,7 +104,7 @@ $(document).ready(function() {
                 msg: userMessage,
             },
             type: "POST",
-            url: "/seus/get",
+            url: "/arch-ru/get",
         }).done(function(data) {
             //var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
             //$("#messageFormeight").append($.parseHTML(botHtml));
@@ -117,7 +118,7 @@ $(document).ready(function() {
                 context.innerHTML += "Chunk " + counter + " :<br><br>" + ctx.replace(/\n/g,"<br>") + "<br><br>";
                 counter++;
             })
-
+            
             data.source.forEach(function(src) {
                 source.innerHTML += src + "<br>";
             });
@@ -141,7 +142,7 @@ $(document).ready(function() {
 
 // Function to get documents from server
 async function fetchDocuments() {
-    const response = await fetch('/seus/documents');
+    const response = await fetch('/arch-ru/documents');
     const documents = await response.json();
     const listElement = document.getElementById('document-list');
 
@@ -157,19 +158,15 @@ async function fetchDocuments() {
         icon.classList.add('icon');
         switch (doc.extension) {
             case 'pdf':
-                icon.src = 'seus/static/document-pdf.svg';
-                break;
-
-            case 'PDF':
-                icon.src = 'seus/static/document-pdf.svg';
+                icon.src = 'arch-ru/static/document-pdf.svg';
                 break;
 
             case 'docs':
-                icon.src = 'seus/static/microsoft-word.svg';
+                icon.src = 'arch-ru/static/microsoft-word.svg';
                 break;                        
         
             default:
-                icon.src = 'seus/static/microsoft-word.svg';
+                icon.src = 'arch-ru/static/microsoft-word.svg';
         }
         listItem.appendChild(icon);
         listItem.appendChild(link);

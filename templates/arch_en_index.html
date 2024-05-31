@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!----===== CSS =====---->
-    <link rel="stylesheet" type="text/css" href="seus/{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" type="text/css" href="arch-en/{{ url_for('static', filename='arch_en_style.css')}}">
     <!----===== Boxicons CSS =====---->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -16,12 +16,12 @@
         <header>
             <div class="image-text">
                 <span class="image">
-                    <img src="seus/{{ url_for('static', filename='seuslogo.jpeg')}}" alt="logo">
+                    <img src="arch-en/{{ url_for('static', filename='logo.png')}}" alt="logo">
                 </span>
 
                 <div class="text header-text">
-                    <span class="name">SEUS</span>
-                    <span class="profession">Smart European <br>Shipbuilding</span>
+                    <span class="name">RAG</span>
+                    <span class="profession">Antonin LARVOR</span>
                 </div>
             </div>
         </header>
@@ -40,7 +40,7 @@
     <main class="main">
         <div class="chatbot">
             <header>
-                <h3>Chat</h3>
+                <h3>Chat-EN</h3>
             </header>
             <ul class="chatbox">
                 <li class="chat incoming">
@@ -89,7 +89,7 @@
     <!-- Inclusion de jQuery depuis le CDN de Google -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script src="seus/{{ url_for('static', filename='script.js') }}"></script>
+    <script src="arch-en/{{ url_for('static', filename='arch_en_script.js') }}"></script>
     
 </body>
 </html>

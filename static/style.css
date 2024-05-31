@@ -127,24 +127,24 @@ header .image-text .header-text{
 }
 
 /*===== left-sidebar components =====*/
-.left-sidebar li{
+.left-sidebar .nav-link{
   background: var(--toggle-color);
-  border-radius: 5px;
+  border-radius: 5px 5px 0px 0px;
   height: 50px;
   margin-top: 10px;
   list-style: none;
   display: flex;
   align-items: center;
 }
-.left-sidebar li .icon{
+.left-sidebar .nav-link .icon{
   min-width: 50px;
   font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.left-sidebar li .icon,
-.left-sidebar li .text{
+.left-sidebar .nav-link .icon,
+.left-sidebar .nav-link .text{
   color: var(--text-color)
 } 
 
@@ -161,13 +161,50 @@ header .image-text .header-text{
   color: var(--text-color);
   transition: var(--tran-03);
   white-space: nowrap;
+  visibility: visible;
   opacity: 1s;
+}
+
+.left-sidebar .document-list{
+  background-color: var(--toggle-color);
+  border-radius: 0px 0px 5px 5px;
+  list-style: none;
+  visibility: visible;
+  opacity: 1;
+  transition: var(--tran-03);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.left-sidebar .document-list li{
+  margin-left: 5px;
+  margin-right: 5px;
+  display: flex;
+  align-items: center;
+}
+.left-sidebar .document-list .icon{
+  color: var(--text-color);
+  width: 20px;
+  height: 20px;
+  margin-right: 10px
+}
+.left-sidebar .document-list a{
+  color: var(--text-color);
+  text-decoration: none;
+}
+.left-sidebar .document-list a:hover{
+  color: var(--primary-color);
 }
 
 /*===== Left-sidebar Close =====*/
 
-.left-sidebar.left-close .text{
+.left-sidebar.left-close .text,
+.left-sidebar.left-close .document-list{
+  visibility: hidden;
   opacity: 0;
+}
+.left-sidebar.left-close .document-list a{
+  pointer-events: none;
 }
 .left-sidebar.left-close ~ .main{
 left: 78px;

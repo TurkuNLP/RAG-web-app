@@ -1,6 +1,11 @@
 def get_embedding_function(model = "voyage"):
+    """get Embedding model between :
+    - sentence-transformers/all-mpnet-base-v2
+    - openai
+    - voyage-law-2
+    Other models can of course be implemented later"""
     if model == "sentence-transformers/all-mpnet-base-v2":
-        from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+        from langchain_community.embeddings import HuggingFaceEmbeddings
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
         
     elif model == "openai":

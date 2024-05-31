@@ -1,11 +1,11 @@
 import argparse
 import os
 import shutil
-
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from langchain.vectorstores.chroma import Chroma
+from llama_index.core import SimpleDirectoryReader
 
 from parameters import DATA_PATH, CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
 from get_embedding_function import get_embedding_function
@@ -24,13 +24,37 @@ def main():
     chunks = split_documents(documents)
     add_to_chroma(chunks)
 
-
 def load_documents():
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    return document_loader.load()
+    """
+    Load pdf documents with a langchain tool
+    Load txt and docx with a llamaindex tool
+    Convert everything in the same Document format
 
+    #TODO Make something better maybe
+    #TODO Implement other document type. llamaindex tool can do it
+    """
+    langchain_document_loader = PyPDFDirectoryLoader(DATA_PATH)
+    langchain_documents = langchain_document_loader.load()
+    llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
+    llama_documents = llama_document_loader.load_data()
+    documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
+    print(len(langchain_documents), len(llama_documents), len(documents))
+    return documents
+
+def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
+    """
+    Convert documents from llamaindex library into the same format as those in langchain, so that you can create a single list
+    """
+    langchain_docs = []
+    for doc in documents:
+        metadata = {"source" : doc.metadata["file_name"], "page" : "N/A"}
+        langchain_docs.append(Document(page_content=doc.text, metadata=metadata))
+    return langchain_docs
 
 def split_documents(documents: list[Document]):
+    """
+    Split documents into smaller chunks
+    """
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=80,
@@ -41,6 +65,11 @@ def split_documents(documents: list[Document]):
 
 
 def add_to_chroma(chunks: list[Document]):
+    """
+    Load the chroma database
+    Check if there are new documents in the documents database
+    Add them to the chroma database
+    """
     # Load the existing database.
     db = Chroma(
         persist_directory=find_chroma_path(EMBEDDING_MODEL,CHROMA_ROOT_PATH), embedding_function=get_embedding_function(EMBEDDING_MODEL)
@@ -70,34 +99,33 @@ def add_to_chroma(chunks: list[Document]):
 
 
 def calculate_chunk_ids(chunks):
-
-    # This will create IDs like "data/monopoly.pdf:6:2"
-    # Page Source : Page Number : Chunk Index
-
+    """
+    Add metadata id to the chunk in the following format:
+    document_name.extension:page_number:chunk_number
+    """
     last_page_id = None
     current_chunk_index = 0
 
     for chunk in chunks:
         source = chunk.metadata.get("source")
-        page = chunk.metadata.get("page")
-        current_page_id = f"{source}:{page}"
+        page = str(chunk.metadata.get("page"))
+        current_page_id = f"{source}:page={page}"
 
-        # If the page ID is the same as the last one, increment the index.
         if current_page_id == last_page_id:
             current_chunk_index += 1
         else:
             current_chunk_index = 0
 
-        # Calculate the chunk ID.
         chunk_id = f"{current_page_id}:{current_chunk_index}"
         last_page_id = current_page_id
-
-        # Add it to the page meta-data.
         chunk.metadata["id"] = chunk_id
-
     return chunks
 
 def find_chroma_path(model_name, base_path = CHROMA_ROOT_PATH):
+    """
+    Find the path to the chroma database corresponding to the Embedding model
+    Create the subfolder in the chroma root folder if not exists
+    """
     if not model_name:
         raise ValueError("Model name can't be empty")
     # Set model_path

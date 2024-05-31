@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!----===== CSS =====---->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='russian_style.css')}}">
+    <link rel="stylesheet" type="text/css" href="arch-ru/{{ url_for('static', filename='arch_en_style.css')}}">
     <!----===== Boxicons CSS =====---->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
@@ -16,7 +16,7 @@
         <header>
             <div class="image-text">
                 <span class="image">
-                    <img src="{{ url_for('static', filename='logo.png')}}" alt="logo">
+                    <img src="arch-ru/{{ url_for('static', filename='logo.png')}}" alt="logo">
                 </span>
 
                 <div class="text header-text">
@@ -30,9 +30,9 @@
             <div class="menu">
                 <li class="nav-link">
                     <i class='bx bx-home icon' ></i>
-                    <span class="text nav-text">Dashboard</span>
+                    <span class="text nav-text">Database</span>
                 </li>
-                <ul class="document-list"></ul>
+                <ul class="document-list" id="document-list"></ul>
             </div>
         </div>
     </nav>
@@ -40,7 +40,7 @@
     <main class="main">
         <div class="chatbot">
             <header>
-                <h3>Chat</h3>
+                <h3>Chat-RU</h3>
             </header>
             <ul class="chatbox">
                 <li class="chat incoming">
@@ -89,7 +89,7 @@
     <!-- Inclusion de jQuery depuis le CDN de Google -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script src="{{ url_for('static', filename='russian_script.js') }}"></script>
+    <script src="arch-ru/{{ url_for('static', filename='arch_ru_script.js') }}"></script>
     
 </body>
 </html>

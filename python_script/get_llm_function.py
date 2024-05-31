@@ -6,7 +6,7 @@ from transformers import (
     pipeline
 )
 
-from langchain.llms import HuggingFacePipeline
+from langchain_community.llms import HuggingFacePipeline
 
 from parameters import LLM_MODEL
 
@@ -14,6 +14,12 @@ global_model = None
 
 
 def get_llm_function(model_name = LLM_MODEL):
+    """get LLM model between :
+    - mistralai/Mixtral-8x7B-Instruct-v0.1
+    - mistralai/Mistral-7B-Instruct-v0.1
+    - nvidia/Llama3-ChatQA-1.5-8B
+    - gpt-3.5-turbo
+    Other models can of course be implemented later"""
     global global_model
     if (model_name == "mistralai/Mixtral-8x7B-Instruct-v0.1" or model_name == "mistralai/Mistral-7B-Instruct-v0.1"):
         if global_model is None:            
@@ -95,7 +101,7 @@ def get_llm_function(model_name = LLM_MODEL):
         return global_model
 
     elif model_name == "gpt-3.5-turbo":
-        from langchain_community.chat_models import ChatOpenAI
+        from langchain_openai import ChatOpenAI
         model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         return model
     
