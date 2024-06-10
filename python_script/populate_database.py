@@ -1,7 +1,18 @@
 import argparse
 import os
 import shutil
+
+from tqdm import tqdm
 from langchain.schema.document import Document
+
+from langchain.document_loaders.pdf import PyPDFDirectoryLoader
+from langchain.document_loaders.pdf import PyPDFLoader
+from typing import List, Union
+from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def main():
     parser = argparse.ArgumentParser(description="This script manages the database for the application. You can use it to clear the database, reset it, or populate it with a specific configuration that can be specified in the config.json file.")
@@ -29,7 +40,10 @@ def main():
             # Clear the existing database existing for the specified config
             subfolder_name = "chroma_{}".format(EMBEDDING_MODEL)
             print("✨ Reseting Database")
-            clear_database(subfolder_name)
+            try:
+                clear_database(subfolder_name)
+            except FolderNotFoundError as e:
+                print(e)
 
         # Create (or update) the data store.
         documents = load_documents()
@@ -54,9 +68,7 @@ def load_documents():
     #TODO Make something better maybe
     #TODO Implement other document type. llamaindex tool can do it
     """
-    from langchain.document_loaders.pdf import PyPDFDirectoryLoader
     from llama_index.core import SimpleDirectoryReader
-    from tqdm import tqdm
 
     langchain_documents = []
     llama_documents = []
@@ -71,7 +83,7 @@ def load_documents():
         print("Continuing...")
 
     print("Loading PDF documents...")
-    langchain_document_loader = PyPDFDirectoryLoader(DATA_PATH)
+    langchain_document_loader = ProgressPyPDFDirectoryLoader(DATA_PATH)
     for doc in tqdm(langchain_document_loader.load(), desc="PDFs loaded"):
         langchain_documents.append(doc)
 
@@ -125,16 +137,18 @@ def add_to_chroma(chunks: list[Document]):
     print(f"Number of existing documents in DB: {len(existing_ids)}")
 
     # Only add documents that don't exist in the DB.
-    new_chunks = []
-    for chunk in chunks_with_ids:
-        if chunk.metadata["id"] not in existing_ids:
-            new_chunks.append(chunk)
+    new_chunks = [chunk for chunk in chunks_with_ids if chunk.metadata["id"] not in existing_ids]
+    batch_size = 1000
 
-    if len(new_chunks):
-        print(f"👉 Adding new documents: {len(new_chunks)}")
-        new_chunk_ids = [chunk.metadata["id"] for chunk in new_chunks]
-        db.add_documents(new_chunks, ids=new_chunk_ids)
-        db.persist()
+    if new_chunks:
+        with tqdm(total=len(new_chunks), desc="Adding documents") as pbar:
+            for i in range(0,len(new_chunks), batch_size):
+                batch = new_chunks[i:i + batch_size]
+                new_chunk_ids = [chunk.metadata["id"] for chunk in batch]
+                db.add_documents(batch, ids=new_chunk_ids)
+                db.persist()
+                pbar.update(len(batch))
+
     else:
         print("✅ No new documents to add")
 
@@ -193,7 +207,7 @@ def clear_database(chroma_subfolder_name = None):
             shutil.rmtree(full_path)
             print(f"The database in {full_path} has been successfully deleted.")
         else:
-            raise ValueError(f"Folder {full_path} doesn't exist")
+            raise FolderNotFoundError(f"Folder {full_path} doesn't exist")
     else:
         print("\nExisting databases :\n\n")
         subfolders = [f for f in os.listdir(CHROMA_ROOT_PATH) if os.path.isdir(os.path.join(CHROMA_ROOT_PATH, f))]
@@ -208,6 +222,35 @@ def clear_database(chroma_subfolder_name = None):
             print("All databases cleared")
         else:
             print("Deletion cancelled.")
+
+
+class ProgressPyPDFDirectoryLoader(PyPDFDirectoryLoader):
+    def load(self) -> List[Document]:
+        p = Path(self.path)
+        docs = []
+        items = list(p.rglob(self.glob)) if self.recursive else list(p.glob(self.glob))
+        
+        with tqdm(total=len(items), desc="Loading PDFs") as pbar:
+            for i in items:
+                if i.is_file():
+                    if self._is_visible(i.relative_to(p)) or self.load_hidden:
+                        try:
+                            loader = PyPDFLoader(str(i), extract_images=self.extract_images)
+                            sub_docs = loader.load()
+                            for doc in sub_docs:
+                                doc.metadata["source"] = str(i)
+                            docs.extend(sub_docs)
+                        except Exception as e:
+                            if self.silent_errors:
+                                logger.warning(e)
+                            else:
+                                raise e
+                pbar.update(1)
+        return docs
+
+class FolderNotFoundError(Exception):
+    """Exception raised when a folder is not found."""
+    pass
 
 if __name__ == "__main__":
     main()
