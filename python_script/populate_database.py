@@ -1,28 +1,49 @@
 import argparse
 import os
 import shutil
-from langchain.document_loaders.pdf import PyPDFDirectoryLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
-from langchain.vectorstores.chroma import Chroma
-from llama_index.core import SimpleDirectoryReader
-
-from parameters import DATA_PATH, CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
-from get_embedding_function import get_embedding_function
 
 def main():
-    # Check if the database should be cleared (using the --clear flag).
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="This script manages the database for the application. You can use it to clear the database, reset it, or populate it with a specific configuration that can be specified in the config.json file.")
+    parser.add_argument("--config", type=str, help="Enter the name of the config you want to populate your database.")
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
-    args = parser.parse_args()
-    if args.reset:
-        print("✨ Clearing Database")
-        clear_database()
+    parser.add_argument("--clear", action="store_true", help="Clear the database.")
 
-    # Create (or update) the data store.
-    documents = load_documents()
-    chunks = split_documents(documents)
-    add_to_chroma(chunks)
+    args = parser.parse_args()
+
+    if args.clear:
+        print("✨ Clearing Database")
+        if args.config:
+            # Clear the specific subfolder specified in the config
+            load_config(args.config)
+            subfolder_name = "chroma_{}".format(EMBEDDING_MODEL)
+            clear_database(subfolder_name)
+        else:
+            # Clear the whole database
+            clear_database()
+        return
+
+    if args.config:
+        load_config(args.config)
+        if args.reset:
+            # Clear the existing database existing for the specified config
+            subfolder_name = "chroma_{}".format(EMBEDDING_MODEL)
+            print("✨ Reseting Database")
+            clear_database(subfolder_name)
+
+        # Create (or update) the data store.
+        documents = load_documents()
+        chunks = split_documents(documents)
+        add_to_chroma(chunks)
+
+def load_config(config_name):
+    """
+    Load and print the parameters entered for config_name into the config.json file.
+    """
+    global DATA_PATH, CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
+    from parameters import load_config as ld
+    ld(config_name, show_config=True)
+    from parameters import DATA_PATH, CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE   
 
 def load_documents():
     """
@@ -33,12 +54,29 @@ def load_documents():
     #TODO Make something better maybe
     #TODO Implement other document type. llamaindex tool can do it
     """
+    from langchain.document_loaders.pdf import PyPDFDirectoryLoader
+    from llama_index.core import SimpleDirectoryReader
+    from tqdm import tqdm
+
+    langchain_documents = []
+    llama_documents = []
+
+    print("Loading TXT and DOCX documents...")
+    try:
+        llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
+        for doc in tqdm(llama_document_loader.load_data(), desc="TXT/DOCX loaded"):
+            llama_documents.append(doc)
+    except ValueError as e:
+        print(e)
+        print("Continuing...")
+
+    print("Loading PDF documents...")
     langchain_document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    langchain_documents = langchain_document_loader.load()
-    llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
-    llama_documents = llama_document_loader.load_data()
+    for doc in tqdm(langchain_document_loader.load(), desc="PDFs loaded"):
+        langchain_documents.append(doc)
+
     documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
-    print(len(langchain_documents), len(llama_documents), len(documents))
+    print(f"Loaded {len(langchain_documents)} PDF documents, {len(llama_documents)} TXT/DOCX documents, {len(documents)} total documents.")
     return documents
 
 def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
@@ -55,6 +93,7 @@ def split_documents(documents: list[Document]):
     """
     Split documents into smaller chunks
     """
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=80,
@@ -70,6 +109,8 @@ def add_to_chroma(chunks: list[Document]):
     Check if there are new documents in the documents database
     Add them to the chroma database
     """
+    from langchain.vectorstores.chroma import Chroma
+    from get_embedding_function import get_embedding_function
     # Load the existing database.
     db = Chroma(
         persist_directory=find_chroma_path(EMBEDDING_MODEL,CHROMA_ROOT_PATH), embedding_function=get_embedding_function(EMBEDDING_MODEL)
@@ -121,13 +162,19 @@ def calculate_chunk_ids(chunks):
         chunk.metadata["id"] = chunk_id
     return chunks
 
-def find_chroma_path(model_name, base_path = CHROMA_ROOT_PATH):
+def find_chroma_path(model_name, base_path):
     """
     Find the path to the chroma database corresponding to the Embedding model
     Create the subfolder in the chroma root folder if not exists
     """
     if not model_name:
         raise ValueError("Model name can't be empty")
+
+    if not base_path:
+        try:
+            base_path = CHROMA_ROOT_PATH
+        except:
+            raise ValueError("The Chroma database root file is not populated")
     # Set model_path
     model_path = os.path.join(base_path, f"chroma_{model_name}")
     if not os.path.exists(model_path):

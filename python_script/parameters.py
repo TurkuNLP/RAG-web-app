@@ -22,7 +22,7 @@ def load_api_keys():
     os.environ["VOYAGE_API_KEY"] = os.getenv("VOYAGE_API_KEY")
 
 
-def load_config(config_name = 'default'):
+def load_config(config_name = 'default', show_config = False):
     """
     Load configuration settings from a JSON file based on the provided configuration name.
     This function sets global variables for various configuration parameters.
@@ -57,9 +57,9 @@ def load_config(config_name = 'default'):
           with open('python_script/config.json', 'r') as file:
               config = json.load(file)
         except FileNotFoundError:
-            raise FileNotFoundError("Le fichier de configuration est introuvable dans les deux chemins spécifiés.")
+            raise FileNotFoundError("The configuration file cannot be found in the specified paths.")
     except json.JSONDecodeError:
-        raise ValueError("Le fichier de configuration est présent mais contient une erreur de format JSON.")
+        raise ValueError("The configuration file is present but contains a JSON format error.")
     
     selected_config = config[config_name]
 
@@ -68,147 +68,214 @@ def load_config(config_name = 'default'):
     EMBEDDING_MODEL = selected_config['embedding_model']
     LLM_MODEL = selected_config['llm_model']
 
-    load_prompt()
+    load_prompt(config_name)
     load_api_keys()
 
+    if show_config:
+        print_config()
+
+def print_config():
+    """
+    Print the current configuration settings.
+    This function prints the values of the global configuration parameters.
+    """
+    global DATA_PATH, CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL
+
+    print("\nCurrent Configuration Settings:\n")
+    print(f"Data Path: {DATA_PATH}")
+    print(f"Chroma Root Path: {CHROMA_ROOT_PATH}")
+    print(f"Embedding Model: {EMBEDDING_MODEL}")
+    print(f"Language Model: {LLM_MODEL}\n")
 
 
-def load_prompt():
+
+def load_prompt(config_name):
     """
     Load the different prompts used in the conversational rag chain
     """
-    global PROMPT_TEMPLATE, REPHRASING_PROMPT, STANDALONE_PROMPT, ROUTER_DECISION_PROMPT
-    PROMPT_TEMPLATE = PromptTemplate.from_template("""# Context #
-    This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
+    global PROMPT_TEMPLATE, REPHRASING_PROMPT, STANDALONE_PROMPT, ROUTER_DECISION_PROMPT    
+    if config_name == 'arch_ru':
+        STANDALONE_PROMPT = PromptTemplate.from_template("""# Context #
+        This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
 
-    #########
+        #########
 
-    # Objective #
-    Generate an appropriate response to the user's question based only on the retieved context.
+        # Objective #
+        Take the original user question and chat history, and generate a new standalone question in russian that can be understood and answered without relying on additional external information.
 
-    #########
+        #########
 
-    # Style #
-    The response should be as detailled as the context permits it.
+        # Style #
+        The reshaped standalone question should be clear, concise, and self-contained, while maintaining the intent and meaning of the original query.
 
-    #########
+        #########
 
-    # Tone #
-    Analytical and objective.
+        # Tone #
+        Neutral and focused on accurately capturing the essence of the original question.
 
-    #########
+        #########
 
-    # Audience #
-    The audience is the user that ask the question.
+        # Audience #
+        The audience is the internal system components that will act on the decision.
 
-    #########
+        #########
 
-    # Response #
-    Provide a detailled awnser that is relevant to the context given.
+        # Response #
+        If the original question requires reshaping, provide a new reshaped standalone question in russian that includes all necessary context and information to be self-contained.
+        If no reshaping is required, simply output the original question as is in russian.
 
-    ##################
+        ##################
 
-    # User question #
-    {question}
+        # Chat History #
+        {chat_history}
 
-    #########
+        #########
 
-    # Context retrieved #
-    {context}
+        # User original question #
+        {question}
 
-    #########
+        #########
 
-    # Your Awnser Here #<|endofprompt|>""")
-    REPHRASING_PROMPT = PromptTemplate.from_template("""# Context #
-    This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
+        # The new Standalone question in russian#<|endofprompt|>""")
 
-    #########
+        PROMPT_TEMPLATE = PromptTemplate.from_template("""# Context #
+        This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions about russian documents. 
 
-    # Objective #
-    Evaluate the given user question and determine if it requires reshaping according to chat history to provide necessary context and information for answering, or if it can be processed as is.
-    Rephrasing is required if the user's question is ambiguous without the context of the previous conversation, or if specific information from the chat history is essential to understand or correctly answer the question.
-    #########
+        #########
 
-    # Style #
-    The response should be clear, concise, and in the form of a straightforward decision - either "Reshape required" or "No reshaping required".
+        # Objective #
+        Generate an appropriate response in English to the user's question based only on the retieved context in Russian and the chat history in English.
 
-    #########
+        #########
 
-    # Tone #
-    Professional and analytical.
+        # Style #
+        The response should be as detailed as the context allows and follow the order of the conversation.
 
-    #########
+        #########
 
-    # Audience #
-    The audience is the internal system components that will act on the decision.
+        # Tone #
+        Analytical and objective.
 
-    #########
+        #########
 
-    # Response #
-    If the question should be rephrased return response in YAML file format:
-    ```
-        result: true
-    ```
-    otherwise return in YAML file format:
-    ```
-        result: false
-    ```
+        # Audience #
+        The audience is the user that ask the question.
 
-    ##################
+        #########
 
-    # Chat History #
-    {chat_history}
+        # Response #
+        Provide a detailled awnser in English that is relevant to the context given.
 
-    #########
+        ##################
 
-    # User question #
-    {question}
+        # User question #
+        {question}
 
-    #########
+        #########
 
-    # Your Decision in YAML format #<|endofprompt|>""")
-    STANDALONE_PROMPT = PromptTemplate.from_template("""# Context #
-    This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
+        # Chat history #
+        {chat_history}
 
-    #########
+        #########
 
-    # Objective #
-    Take the original user question and chat history, and generate a new standalone question that can be understood and answered without relying on additional external information.
+        # Context retrieved #
+        {context}
 
-    #########
+        #########
 
-    # Style #
-    The reshaped standalone question should be clear, concise, and self-contained, while maintaining the intent and meaning of the original query.
+        # Your Awnser in English Here #<|endofprompt|>""")
+    else:
+        PPROMPT_TEMPLATE = PromptTemplate.from_template("""# Context #
+        This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
 
-    #########
+        #########
 
-    # Tone #
-    Neutral and focused on accurately capturing the essence of the original question.
+        # Objective #
+        Generate an appropriate response to the user's question based only on the retieved context and the chat history.
 
-    #########
+        #########
 
-    # Audience #
-    The audience is the internal system components that will act on the decision.
+        # Style #
+        The response should be as detailed as the context allows and follow the order of the conversation.
 
-    #########
+        #########
 
-    # Response #
-    If the original question requires reshaping, provide a new reshaped standalone question that includes all necessary context and information to be self-contained.
-    If no reshaping is required, simply output the original question as is.
+        # Tone #
+        Analytical and objective.
 
-    ##################
+        #########
 
-    # Chat History #
-    {chat_history}
+        # Audience #
+        The audience is the user that ask the question.
 
-    #########
+        #########
 
-    # User original question #
-    {question}
+        # Response #
+        Provide a detailled awnser that is relevant to the context given.
 
-    #########
+        ##################
 
-    # The new Standalone question #<|endofprompt|>""")
+        # User question #
+        {question}
+
+        #########
+
+        # Chat history #
+        {chat_history}
+
+        #########
+
+        # Context retrieved #
+        {context}
+
+        #########
+
+        # Your Awnser Here #<|endofprompt|>""")
+        
+        STANDALONE_PROMPT = PromptTemplate.from_template("""# Context #
+        This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
+
+        #########
+
+        # Objective #
+        Take the original user question and chat history, and generate a new standalone question that can be understood and answered without relying on additional external information.
+
+        #########
+
+        # Style #
+        The reshaped standalone question should be clear, concise, and self-contained, while maintaining the intent and meaning of the original query.
+
+        #########
+
+        # Tone #
+        Neutral and focused on accurately capturing the essence of the original question.
+
+        #########
+
+        # Audience #
+        The audience is the internal system components that will act on the decision.
+
+        #########
+
+        # Response #
+        If the original question requires reshaping, provide a new reshaped standalone question that includes all necessary context and information to be self-contained.
+        If no reshaping is required, simply output the original question as is.
+
+        ##################
+
+        # Chat History #
+        {chat_history}
+
+        #########
+
+        # User original question #
+        {question}
+
+        #########
+
+        # The new Standalone question #<|endofprompt|>""")
+
+
     ROUTER_DECISION_PROMPT = PromptTemplate.from_template("""# Context #
     This is part of a conversational AI system that determines whether to use a retrieval-augmented generator (RAG) or a chat model to answer user questions. 
 
@@ -257,44 +324,52 @@ def load_prompt():
     #########
 
     # Your Decision in YAML format #<|endofprompt|>""")
-    RAG_PROMPT = PromptTemplate.from_template("""# Context #
+
+    REPHRASING_PROMPT = PromptTemplate.from_template("""# Context #
     This is part of a conversational retrieval-augmented generator (RAG) AI system to answer user questions. 
 
     #########
 
     # Objective #
-    Generate an appropriate response to the user's question based only on the retieved context.
-
+    Evaluate the given user question and determine if it requires reshaping according to chat history to provide necessary context and information for answering, or if it can be processed as is.
+    Rephrasing is required if the user's question is ambiguous without the context of the previous conversation, or if specific information from the chat history is essential to understand or correctly answer the question.
     #########
 
     # Style #
-    The response should be as detailled as the context permits it.
+    The response should be clear, concise, and in the form of a straightforward decision - either "Reshape required" or "No reshaping required".
 
     #########
 
     # Tone #
-    Analytical and objective.
+    Professional and analytical.
 
     #########
 
     # Audience #
-    The audience is the user that ask the question.
+    The audience is the internal system components that will act on the decision.
 
     #########
 
     # Response #
-    Provide a detailled awnser that is relevant to the context given.
+    If the question should be rephrased return response in YAML file format:
+    ```
+        result: true
+    ```
+    otherwise return in YAML file format:
+    ```
+        result: false
+    ```
 
     ##################
+
+    # Chat History #
+    {chat_history}
+
+    #########
 
     # User question #
     {question}
 
     #########
 
-    # Context retrieved #
-    {context}
-
-    #########
-
-    # Your Awnser Here #<|endofprompt|>""")
+    # Your Decision in YAML format #<|endofprompt|>""")
