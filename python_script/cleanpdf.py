@@ -12,9 +12,6 @@ def extract_text_from_pdf(pdf_path):
     text = ""
     for page_num in range(len(doc)):
 
-        if page_num == 25:
-            break
-
         page = doc.load_page(page_num)
         page_text = page.get_text("text")
 
@@ -26,7 +23,7 @@ def extract_text_from_pdf(pdf_path):
             img = Image.open(io.BytesIO(pix.tobytes()))
             
             # Use pytesseract to do OCR on the image
-            page_text = pytesseract.image_to_string(img)
+            page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
 
         lines = page_text.split('\n')
         
@@ -129,45 +126,3 @@ output_dir = "data/output"
 process_directory(input_dir, output_dir)
 
 print("Traitement terminé avec succès.")
-
-# import fitz  # PyMuPDF
-# from PIL import Image
-# import pytesseract
-# import io
-
-# def pdf_to_text(pdf_path):
-#     # Open the provided PDF file
-#     pdf_document = fitz.open(pdf_path)
-    
-#     # Initialize an empty string to accumulate text
-#     accumulated_text = ""
-    
-#     # Iterate through each page in the PDF
-#     for page_number in range(len(pdf_document)):
-#         # Get the page
-#         page = pdf_document.load_page(page_number)
-        
-#         # Convert the page to an image
-#         image_matrix = fitz.Matrix(300 / 72, 300 / 72)  # Zoom factor 300 DPI
-#         pix = page.get_pixmap(matrix=image_matrix)
-        
-#         # Convert the pixmap object to a PIL image object
-#         img = Image.open(io.BytesIO(pix.tobytes()))
-        
-#         # Use pytesseract to do OCR on the image
-#         text = pytesseract.image_to_string(img)
-        
-#         # Append the extracted text to the accumulated text
-#         accumulated_ text += text + "\n"
-    
-#     # Close the PDF after processing
-#     pdf_document.close()
-    
-#     # Return the accumulated text
-#     return accumulated_text
-
-# # Example usage
-# pdf_path = "path/to/your/pdf_file.pdf"
-# extracted_text = pdf_to_text(pdf_path)
-# print(extracted_text)
-
