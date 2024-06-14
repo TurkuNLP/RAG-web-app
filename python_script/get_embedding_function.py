@@ -15,6 +15,10 @@ def get_embedding_function(model = "voyage"):
     elif model == "voyage-law-2":
         from langchain_voyageai import VoyageAIEmbeddings
         embeddings = VoyageAIEmbeddings(model="voyage-law-2")
+
+    elif model == "voyage-multilingual-2":
+        from langchain_voyageai import VoyageAIEmbeddings
+        embeddings = VoyageAIEmbeddings(model="voyage-multilingual-2")        
         
     else:
         # TODO create error message

@@ -4,11 +4,13 @@
 # Cache folders
 __pycache__/
 python_script/__pycache__/
+python_script/old/
 
 # Datas folders
 data/
 
 # Other files or folders to ignore
+.gitignore
 node_modules/
 *.log
 *.pyc

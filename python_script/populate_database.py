@@ -73,16 +73,13 @@ def load_documents():
     langchain_documents = []
     llama_documents = []
 
-    print("Loading TXT and DOCX documents...")
     try:
         llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
         for doc in tqdm(llama_document_loader.load_data(), desc="TXT/DOCX loaded"):
             llama_documents.append(doc)
     except ValueError as e:
         print(e)
-        print("Continuing...")
 
-    print("Loading PDF documents...")
     langchain_document_loader = ProgressPyPDFDirectoryLoader(DATA_PATH)
     for doc in tqdm(langchain_document_loader.load(), desc="PDFs loaded"):
         langchain_documents.append(doc)
