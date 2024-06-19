@@ -6,6 +6,7 @@ import re
 from PIL import Image
 import pytesseract
 import io
+from docxcompose.composer import Composer
 
 def extract_text_from_pdf(pdf_path):
     doc = fitz.open(pdf_path)
@@ -15,7 +16,10 @@ def extract_text_from_pdf(pdf_path):
         page = doc.load_page(page_num)
         page_text = page.get_text("text")
 
-        if pdf_path.find('RA_2007_'):
+        if pdf_path.split('/')[-1].find('RA_2009_1') == 0 or \
+            pdf_path.split('/')[-1].find('RA_2009_2') == 0 or \
+            pdf_path.split('/')[-1].find('RA_2009_3') == 0:
+            
             image = page.get_pixmap()
             pix = page.get_pixmap(matrix=image)
         
@@ -24,7 +28,7 @@ def extract_text_from_pdf(pdf_path):
             
             # Use pytesseract to do OCR on the image
             page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
-
+            print(pdf_path.split('/')[-1], page_num)
         lines = page_text.split('\n')
         
         paragraph = ""
@@ -60,6 +64,7 @@ def save_text_to_docx(texts, docx_path_base, max_chars=980000):
     char_count = 0
     
     doc = Document()
+    print('save_text_to_docx: BEGIN')
     
     def create_new_doc():
         nonlocal doc, doc_num, char_count
@@ -68,6 +73,8 @@ def save_text_to_docx(texts, docx_path_base, max_chars=980000):
             doc_num += 1
             char_count = 0
             doc = Document()
+        else:
+            print('create_new_doc: NO CONTENT')
     
     for text, document_title in texts:
         # Ajouter le titre du document en gras
@@ -105,24 +112,67 @@ def save_text_to_docx(texts, docx_path_base, max_chars=980000):
     # Save the final document if it has any content
     if char_count > 0:
         doc.save(f"{docx_path_base}_{doc_num}.docx")
+    else : 
+        print('save_text_to_docx: NO CONTENT')
 
 def process_directory(input_dir, output_dir):
+    print('process_directory: BEGIN')
     texts = []
+    output_base = os.path.join(output_dir, "document")
+
     for filename in os.listdir(input_dir):
+        texts.clear()
         if filename.endswith(".pdf"):
             pdf_path = os.path.join(input_dir, filename)
             document_title = os.path.splitext(filename)[0]
             texte_extrait = extract_text_from_pdf(pdf_path)
             texts.append((texte_extrait, document_title))
     
-    output_base = os.path.join(output_dir, "document")
-    save_text_to_docx(texts, output_base)
+            save_text_to_docx(texts, output_base + document_title)
+
+def merge_docx_files(input_dir, output_path, max_chars=980000):
+    def get_docx_files(directory):
+        return [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.docx')]
+
+    def create_composer(docx_files):
+        base_doc = Document(docx_files[0])
+        composer = Composer(base_doc)
+        for docx_file in docx_files[1:]:
+            composer.append(Document(docx_file))
+        return composer
+
+    docx_files = get_docx_files(input_dir)
+    doc_num = 1
+    char_count = 0
+    current_composer = None
+
+    for docx_file in docx_files:
+        temp_doc = Document(docx_file)
+        temp_text = '\n'.join([p.text for p in temp_doc.paragraphs])
+        temp_char_count = len(temp_text)
+        
+        if current_composer is None:
+            current_composer = create_composer([docx_file])
+            char_count = temp_char_count
+        else:
+            if char_count + temp_char_count > max_chars:
+                current_composer.save(f"{output_path}_{doc_num:02d}.docx")
+                doc_num += 1
+                current_composer = create_composer([docx_file])
+                char_count = temp_char_count
+            else:
+                current_composer.append(Document(docx_file))
+                char_count += temp_char_count
+    
+    if current_composer:
+        current_composer.save(f"{output_path}_{doc_num:02d}.docx")
 
 # Spécifiez les chemins du répertoire d'entrée et de sortie
-input_dir = "data/russian_data"
-output_dir = "data/output"
+input_dir = "/home/mtebad/projects/RAG-web-app/data"
+output_dir = "/home/mtebad/projects/RAG-web-app/data/output2"
 
 # Traiter tous les fichiers PDF dans le répertoire d'entrée
-process_directory(input_dir, output_dir)
+#process_directory(input_dir, output_dir)
+merge_docx_files(output_dir, os.path.join('/home/mtebad/projects/RAG-web-app/data/output', "merged_document"))
 
 print("Traitement terminé avec succès.")
