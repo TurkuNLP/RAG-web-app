@@ -1,0 +1,95 @@
+/* Base Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-size: 13px;
+  overflow: hidden;
+  transition: padding-left 0.3s ease, padding-right 0.3s ease;
+}
+
+/* Overlay Styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 9999;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.black-background {
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 999;
+}
+
+.black-background.hidden {
+  display: none !important;
+}
+
+/* Small screen conditions */
+.small .sidebar-left {
+  width: 20rem;
+}
+
+.small .sidebar-right {
+  width: 100vw !important;
+}
+
+.small {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/* Medium screen conditions */
+.medium .sidebar-left {
+  width: 20rem;
+}
+
+.medium .sidebar-right {
+  width: 50vw !important;
+}
+
+.medium {
+  padding-left: 20rem;
+  padding-right: 50vw;
+}
+
+.medium.left-sidebar-closed {
+  padding-left: 0;
+}
+
+.medium.right-sidebar-closed {
+  padding-right: 0;
+}
+
+/* Large screen conditions */
+.large .sidebar-left {
+  width: 20rem;
+}
+
+.large .sidebar-right {
+  width: 35vw !important;
+}
+
+.large {
+  padding-left: 20rem;
+  padding-right: 35vw;
+}
+
+.large.left-sidebar-closed {
+  padding-left: 0;
+}
+
+.large.right-sidebar-closed {
+  padding-right: 0;
+}

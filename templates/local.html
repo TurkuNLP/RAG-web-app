@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Sidebar Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome5-overrides.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbox.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-left.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-right.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora">
+</head>
+
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="black-background hidden"></div>
+
+    <!-- Left Sidebar -->
+    <ul class="nav flex-column shadow d-flex sidebar-left">
+        <div class="nav-header">
+            <li class="nav-item logo-holder">
+                <div class="text-center text-white logo">
+                    <a class="text-white float-left" id="sidebarToggleHolder" href="#">
+                        <img src="static/img/menu.svg" alt="menubar" class="icon" id="leftSidebarToggle">
+                        <!--<i class="fas fa-bars" id="leftSidebarToggle"></i> -->
+                    </a>
+                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Sidebar</strong></a>
+                </div>
+            </li>
+        </div>
+        <div class="nav-body">
+            <div class="accordion">
+                <div class="card-header settings-header collapse-open">
+                    <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseSettings" aria-expanded="false" aria-controls="collapseSettings">
+                        <span class="float-left">
+                            <img src="static/img/setting.svg" alt="setting button" class="icon">Settings
+                        </span>
+                        <i class="fas fa-caret-down float-right"></i>
+                    </button>
+                </div>
+                <div id="collapseSettings" class="collapse" aria-labelledby="settingsHeader">
+                    <div class="card-body text-white text-justify settings">
+                        <li class="settings-item">
+                            <div class="slider-value">Number of retrieved chunks: <span id="chunkSliderValue">1</span></div>
+                            <div class="slider-container">
+                                <span id="minValue">1</span>
+                                <input type="range" class="form-control-range" id="chunkSlider" min="1" max="30" step="1">
+                                <span id="maxValue">30</span>
+                            </div>
+                        </li>
+                        <li class="settings-item">
+                            <div class="slider-value">Precision score required: <span id="precisionSliderValue">1</span>%</div>
+                            <div class="slider-container">
+                                <span id="minValue">1%</span>
+                                <input type="range" class="form-control-range" id="precisionSlider" min="1" max="100" step="1">
+                                <span id="maxValue">100%</span>
+                            </div>
+                        </li>
+                        <li class="settings-item">
+                            <label for="embeddingModelDropdown">Embedding model:</label>
+                            <select class="custom-select" id="embeddingModelDropdown">
+                                <option value="option1">ChatGPT 3.5</option>
+                                <option value="option2">ChatGPT 4</option>
+                                <option value="option3">ChatGPT 4o</option>
+                                <option value="option4">VoyageAI</option>
+                                <option value="option5">VoyageAI multilingual</option>
+                            </select>
+                        </li>
+                        <li class="settings-item last-item">
+                            <label for="llmModelDropdown">LLM model:</label>
+                            <select class="custom-select" id="llmModelDropdown">
+                                <option value="option1">ChatGPT 3.5</option>
+                                <option value="option2">ChatGPT 4</option>
+                                <option value="option3">ChatGPT 4o</option>
+                                <option value="option4">VoyageAI</option>
+                                <option value="option5">VoyageAI multilingual</option>
+                            </select>
+                        </li>
+                    </div>
+                </div>
+                <div class="card-header database-header collapse-open">
+                    <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseDatabase" aria-expanded="false" aria-controls="collapseDatabase">
+                        <span class="float-left">
+                            <img src="static/img/folder.svg" alt="database button" class="icon">Database
+                        </span>
+                        <i class="fas fa-caret-down float-right"></i>
+                    </button>
+                </div>
+                <div id="collapseDatabase" class="collapse" aria-labelledby="databaseHeader">
+                    <div class="card-body text-white text-justify database">
+                        <div class="shadeoverlay"></div>
+                        <!-- <li class="database-item"><i class="fa fa-file-pdf-o"></i>example</li> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-footer">
+            <li class="nav-item">
+                <a class="nav-link text-left text-white py-1 px-0" href="#">
+                    <img src="static/img/logout.svg" alt="logout button" class="icon mx-3">
+                    <span class="text-nowrap mx-2">Log out</span>
+                </a>
+            </li>
+        </div>
+    </ul>
+
+    <!-- Chatbox -->
+    <div class="container-fluid h-100 chat">
+        <div class="row h-100 d-flex justify-content-center">
+            <div class="col-lg-10 col-xl-8 chat h-100 d-flex flex-column">
+                <div class="card h-100 w-100 d-flex flex-column">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Turku NLP RAG</span>
+                    </div>
+                    <div class="card-body flex-grow-1" data-mdb-perfect-scrollbar-init>
+                        <ul class="chatbox list-unstyled">
+                            <li class="message incoming">Message inc</li>
+                            <li class="message outcoming">Message out</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-muted d-flex justify-content-start align-items-center">
+                        <div class="chat-input-container">
+                            <textarea id="chatInput" class="form-control" placeholder="Type message" rows="1"></textarea>
+                            <button class="btn ml-2 send-btn">
+                                <img src="static/img/sent.svg" alt="send button" class="icon">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <ul class="nav flex-column shadow d-flex sidebar-right">
+        <div class="nav-header">
+            <li class="nav-item logo-holder">
+                <div class="text-center text-white logo">
+                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Context Menu</strong></a>
+                    <a class="text-white float-right" id="sidebarToggleHolder" href="#">
+                        <img src="static/img/menu.svg" alt="menubar" class="icon" id="rightSidebarToggle">
+                    </a>
+                </div>
+            </li>
+        </div>
+        <div class="nav-body">
+            <div class="accordion context-retriever">
+
+            </div>
+        </div>
+        <div class="nav-footer">
+            <!-- Add footer content if necessary -->
+        </div>
+    </ul>
+
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+
+</html>
