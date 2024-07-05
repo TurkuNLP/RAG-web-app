@@ -1,27 +1,35 @@
-from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
+from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL
 
 from get_embedding_function import get_embedding_function
 from get_llm_function import get_llm_function
 from populate_database import find_chroma_path
 
-from langchain_core.messages import HumanMessage
 from langchain.vectorstores.chroma import Chroma
 from langchain.chains import create_history_aware_retriever
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-def get_rag_chain():
+def get_rag_chain(retrieved_doc_nb = 5, params = None):
+    default_params = {
+        "CHROMA_ROOT_PATH": CHROMA_ROOT_PATH,
+        "EMBEDDING_MODEL": EMBEDDING_MODEL,
+        "LLM_MODEL": LLM_MODEL,
+    }
+    if params is None :
+        params = default_params
+    else:
+        params = {**default_params, **params}
+
     try:
-        embedding_model = get_embedding_function(EMBEDDING_MODEL)
-        llm = get_llm_function(LLM_MODEL)
-        db = Chroma(persist_directory=find_chroma_path(EMBEDDING_MODEL,CHROMA_ROOT_PATH), embedding_function=embedding_model)
+        embedding_model = get_embedding_function(model_name=EMBEDDING_MODEL)
+        llm = get_llm_function(model_name=LLM_MODEL)
+        db = Chroma(persist_directory=find_chroma_path(model_name=EMBEDDING_MODEL, base_path=CHROMA_ROOT_PATH), embedding_function=embedding_model)
     except NameError as e:
         variable_name = str(e).split("'")[1]
         raise NameError (f"The global variable '{variable_name}' is not defined. Please ensure that all required global variables (EMBEDDING_MODEL, LLM_MODEL, CHROMA_ROOT_PATH) are imported or defined.") from e
     
-    retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+    retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": retrieved_doc_nb})
 
 
     contextualize_q_system_prompt = """Given a chat history and the latest user question \

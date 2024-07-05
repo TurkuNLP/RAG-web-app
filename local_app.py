@@ -6,24 +6,25 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 local_app = Flask(__name__)
 
 def init_app():
-    local_app.config['UPLOAD_FOLDER'] = "document"
     load_rag()
+    local_app.config['UPLOAD_FOLDER'] = DATA_PATH
 
 def load_rag():
     sys.path.append(os.path.join(os.path.dirname(__file__), 'python_script'))
     from parameters import load_config
     load_config('test')
-
+    
+    global DATA_PATH
     from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE, DATA_PATH, REPHRASING_PROMPT, STANDALONE_PROMPT, ROUTER_DECISION_PROMPT
     from get_llm_function import get_llm_function
-    from get_rag_chain_V2 import get_rag_chain
-    from ConversationalRagChainV2 import ConversationalRagChain
+    from get_rag_chain import get_rag_chain
+    from ConversationalRagChain import ConversationalRagChain
 
     global rag_conv
 
     rag_conv = ConversationalRagChain.from_llm(
         rag_chain=get_rag_chain(),
-        llm=get_llm_function(LLM_MODEL),
+        llm=get_llm_function(model_name = LLM_MODEL),
         callbacks=None
     )
 

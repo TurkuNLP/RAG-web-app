@@ -91,7 +91,7 @@ class ConversationalRagChain(Chain):
         sources = []
         for doc in documents:
             contexts.append(doc.page_content)
-            sources.append(doc.metadata['id'])
+            sources.append(doc.metadata['source'])
         return answer,contexts,sources
 
     def update_chat_history(self, user_question, bot_response):
