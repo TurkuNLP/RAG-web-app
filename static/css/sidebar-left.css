@@ -147,6 +147,12 @@
   border-radius: 1rem;
   margin-bottom: 0.5rem;
 }
+.sidebar-left .nav-body .card-body .settings-item select#searchTypeDropdown {
+  margin-bottom: 1rem;
+}
+.sidebar-left .nav-body .card-body .settings-item .hidden {
+  display: none;
+}
 .sidebar-left .nav-body .card-body .settings-item.last-item {
   margin-bottom: 0rem;
 }

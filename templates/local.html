@@ -47,39 +47,67 @@
                 <div id="collapseSettings" class="collapse" aria-labelledby="settingsHeader">
                     <div class="card-body text-white text-justify settings">
                         <li class="settings-item">
-                            <div class="slider-value">Number of retrieved chunks: <span id="chunkSliderValue">1</span></div>
-                            <div class="slider-container">
-                                <span id="minValue">1</span>
-                                <input type="range" class="form-control-range" id="chunkSlider" min="1" max="30" step="1">
-                                <span id="maxValue">30</span>
+                            <label for="searchTypeDropdown">Search type:</label>
+                            <select class="custom-select" id="searchTypeDropdown">
+                                <option value="similarity">Similarity</option>
+                                <option value="similarity_score_threshold">Similarity score threshold</option>
+                                <option value="mmr">MMR</option>
+                            </select>
+                            
+                            <div id="similarityContent">
+                                <div class="slider-value">Number of retrieved chunks: <span id="similaritySliderValue">1</span></div>
+                                <div class="slider-container">
+                                    <span id="minValue">1</span>
+                                    <input type="range" class="form-control-range" id="similaritySlider" min="1" max="30" step="1">
+                                    <span id="maxValue">30</span>
+                                </div>
                             </div>
-                        </li>
-                        <li class="settings-item">
-                            <div class="slider-value">Precision score required: <span id="precisionSliderValue">1</span>%</div>
-                            <div class="slider-container">
-                                <span id="minValue">1%</span>
-                                <input type="range" class="form-control-range" id="precisionSlider" min="1" max="100" step="1">
-                                <span id="maxValue">100%</span>
+                            
+                            <div id="similarityScoreContent" class="hidden">
+                                <div class="slider-value">Similarity score required: <span id="similarityScoreSliderValue">1</span>%</div>
+                                <div class="slider-container">
+                                    <span id="minValue">1%</span>
+                                    <input type="range" class="form-control-range" id="similarityScoreSlider" min="1" max="100" step="1">
+                                    <span id="maxValue">100%</span>
+                                </div>
+                            </div>
+
+                            <div id="mmrContent" class="hidden">
+                                <div class="slider-value">Number of considered chunks: <span id="consideredChunkSliderValue">1</span></div>
+                                <div class="slider-container">
+                                    <span id="minValue">1</span>
+                                    <input type="range" class="form-control-range" id="consideredChunkSlider" min="1" max="30" step="1">
+                                    <span id="maxValue">30</span>
+                                </div>
+                                <div class="slider-value">Number of retrieved chunks: <span id="retrievedChunkSliderValue">1</span></div>
+                                <div class="slider-container">
+                                    <span id="minValue">1</span>
+                                    <input type="range" class="form-control-range" id="retrievedChunkSlider" min="1" max="30" step="1">
+                                    <span id="maxValue">30</span>
+                                </div>
+                                <div class="slider-value">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%</div>
+                                <div class="slider-container">
+                                    <span id="minValue">1%</span>
+                                    <input type="range" class="form-control-range" id="lambdaSlider" min="1" max="100" step="1">
+                                    <span id="maxValue">100%</span>
+                                </div>
                             </div>
                         </li>
                         <li class="settings-item">
                             <label for="embeddingModelDropdown">Embedding model:</label>
                             <select class="custom-select" id="embeddingModelDropdown">
-                                <option value="option1">ChatGPT 3.5</option>
-                                <option value="option2">ChatGPT 4</option>
-                                <option value="option3">ChatGPT 4o</option>
-                                <option value="option4">VoyageAI</option>
-                                <option value="option5">VoyageAI multilingual</option>
+                                <option value="openai">Openai</option>
+                                <option value="voyage-law-2">Voyage Law 2</option>
+                                <option value="voyage-multilingual-2">Voyage Multilingual 2</option>
                             </select>
                         </li>
                         <li class="settings-item last-item">
                             <label for="llmModelDropdown">LLM model:</label>
                             <select class="custom-select" id="llmModelDropdown">
-                                <option value="option1">ChatGPT 3.5</option>
-                                <option value="option2">ChatGPT 4</option>
-                                <option value="option3">ChatGPT 4o</option>
-                                <option value="option4">VoyageAI</option>
-                                <option value="option5">VoyageAI multilingual</option>
+                                <option value="gpt-3.5-turbo">ChatGPT 3.5</option>
+                                <option value="nvidia/Llama3-ChatQA-1.5-8B">Llama3 ChatQA 1.5 8B</option>
+                                <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral 8x7B Instruct v0</option>
+                                <option value="mistralai/Mistral-7B-Instruct-v0.1">Mistral 7B Instruct v0.1</option>
                             </select>
                         </li>
                     </div>

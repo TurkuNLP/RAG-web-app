@@ -3,6 +3,7 @@ def get_embedding_function(model_name = "voyage"):
     - sentence-transformers/all-mpnet-base-v2
     - openai
     - voyage-law-2
+    - voyage-multilingual-2
     Other models can of course be implemented later"""
     if model_name == "sentence-transformers/all-mpnet-base-v2":
         from langchain_community.embeddings import HuggingFaceEmbeddings

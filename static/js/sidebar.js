@@ -11,6 +11,26 @@
     const settingsDropdown = document.getElementById("collapseSettings");
     const chatBox = document.querySelector('.chatbox');
     const chatInput = document.getElementById("chatInput");
+    
+    const searchTypeDropdown = document.getElementById('searchTypeDropdown');
+    const embeddingModelDropdown = document.getElementById('embeddingModelDropdown');
+    const llmModelDropdown = document.getElementById('llmModelDropdown');
+
+    const similaritySlider = $('#similaritySlider');
+    const similaritySliderValue = $('#similaritySliderValue');
+
+    const similarityScoreSlider = $('#similarityScoreSlider');
+    const similarityScoreSliderValue = $('#similarityScoreSliderValue');
+    
+    const consideredChunkSlider = $('#consideredChunkSlider');
+    const consideredChunkSliderValue = $('#consideredChunkSliderValue');
+
+    const retrievedChunkSlider = $('#retrievedChunkSlider');
+    const retrievedChunkSliderValue = $('#retrievedChunkSliderValue');
+
+    const lambdaSlider = $('#lambdaSlider');
+    const lambdaSliderValue = $('#lambdaSliderValue');
+
 
     let rightWasOpen = true;
     let leftWasOpen = true;
@@ -19,12 +39,14 @@
 
     // Initialization
     function init() {
-        initSettings(5,90);
+        initSettings(5,90,25,5,25);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
         bindEvents();
         leftSidebarEvents();
         bindChatEvents();
+        ragOptions();
+        updateSettings();
         databaseDropdown.classList.add('show');
         settingsDropdown.classList.add('show');
     }
@@ -76,20 +98,26 @@
         });
     }
 
-    function initSettings(initSliderValue, initPrecisionValue) {
-        const chunkSlider = $('#chunkSlider');
-        const chunkSliderValue = $('#chunkSliderValue');
-        chunkSliderValue.text(initSliderValue)
-        chunkSlider.val(initSliderValue)
+    function initSettings(initSimilarityVal, initSimilarityScoreVal, initConsideredVal, initRetrievedVal, initLambdaVal) {
+        similaritySliderValue.text(initSimilarityVal);
+        similaritySlider.val(initSimilarityVal);
 
-        const precisionSlider = $('#precisionSlider');
-        const precisionSliderValue = $('#precisionSliderValue');
-        precisionSliderValue.text(initPrecisionValue);
-        precisionSlider.val(initPrecisionValue);
+        similarityScoreSliderValue.text(initSimilarityScoreVal);
+        similarityScoreSlider.val(initSimilarityScoreVal);
+
+        consideredChunkSliderValue.text(initConsideredVal);
+        consideredChunkSlider.val(initConsideredVal);
+
+        retrievedChunkSliderValue.text(initRetrievedVal);
+        retrievedChunkSlider.val(initRetrievedVal);
+
+        lambdaSliderValue.text(initLambdaVal);
+        lambdaSlider.val(initLambdaVal);
     }
 
     function leftSidebarEvents() {
         $(document).ready(function() {
+            // Open/close menus
             $('#collapseSettings').on('show.bs.collapse', function() {
                 $('.settings-header').addClass('collapse-open');
             }).on('hide.bs.collapse', function() {
@@ -105,21 +133,97 @@
                     $('.database-header').removeClass('collapse-open');
                 }, 300);
             });
-    
-            const chunkSlider = $('#chunkSlider');
-            const chunkSliderValue = $('#chunkSliderValue');
-            chunkSlider.on('input', function() {
-                chunkSliderValue.text(this.value);
-            });
-            chunkSliderValue.text(chunkSlider.val());
-    
-            const precisionSlider = $('#precisionSlider');
-            const precisionSliderValue = $('#precisionSliderValue');
-            precisionSlider.on('input', function() {
-                precisionSliderValue.text(this.value);
-            });
-            precisionSliderValue.text(precisionSlider.val());
         });
+    }
+
+    function updateSettings() {
+        $(document).ready(function() {
+            // Sliders
+            similaritySlider.on('input', function() {
+                similaritySliderValue.text(this.value);
+                sendOptions();
+            });
+            similaritySliderValue.text(similaritySlider.val());
+
+            similarityScoreSlider.on('input', function() {
+                similarityScoreSliderValue.text(this.value);
+                sendOptions();
+            });
+            similarityScoreSliderValue.text(similarityScoreSlider.val());
+
+            consideredChunkSlider.on('input', function() {
+                consideredChunkSliderValue.text(this.value);
+                sendOptions();
+            });
+            consideredChunkSliderValue.text(consideredChunkSlider.val());
+
+            retrievedChunkSlider.on('input', function() {
+                retrievedChunkSliderValue.text(this.value);
+                sendOptions();
+            });
+            retrievedChunkSliderValue.text(retrievedChunkSlider.val());
+
+            lambdaSlider.on('input', function() {
+                lambdaSliderValue.text(this.value);
+                sendOptions();
+            });
+            lambdaSliderValue.text(lambdaSlider.val());
+
+            $('#searchTypeDropdown').on('change', function() {
+                sendOptions();
+            });
+
+            $('#embeddingModelDropdown').on('change', function() {
+                sendOptions();
+            });
+
+            $('#llmModelDropdown').on('change', function() {
+                sendOptions();
+            });
+        });
+    }
+
+    function sendOptions() {
+        var rag_settings = {
+            embedding_model: embeddingModelDropdown.value,
+            llm_model: llmModelDropdown.value,
+            search_type: searchTypeDropdown.value,
+            similarity_doc_nb: parseInt(similaritySlider.val(), 10),
+            score_threshold: parseInt(similarityScoreSlider.val(), 10) / 100,
+            considered_chunk: parseInt(consideredChunkSlider.val(), 10),
+            mmr_doc_nb: parseInt(retrievedChunkSlider.val(), 10),
+            lambda_mult: parseInt(lambdaSlider.val(), 10) / 100
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/update-settings",
+            data: JSON.stringify(rag_settings),
+            contentType: "application/json",
+            error: function(error) {
+                console.error('Error updating settings:', error);
+            }
+        });
+    }
+
+    function ragOptions() {
+        searchTypeDropdown.addEventListener('change', function () {
+            var similarity = document.getElementById('similarityContent');
+            var similarity_score = document.getElementById('similarityScoreContent');
+            var mmr = document.getElementById('mmrContent');
+
+            similarity.classList.add('hidden');
+            similarity_score.classList.add('hidden');
+            mmr.classList.add('hidden');
+
+            if (this.value === 'similarity') {
+                similarity.classList.remove('hidden');
+            } else if (this.value === 'similarity_score_threshold') {
+                similarity_score.classList.remove('hidden');
+            } else if (this.value === 'mmr') {
+                mmr.classList.remove('hidden');
+            }
+        });        
     }
 
     function bindChatEvents() {
@@ -130,7 +234,7 @@
             });
 
             $("#chatInput").on("keypress", function(event) {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" && chatInput.value != "") {
                     event.preventDefault();
                     submitQuery();
                 }
@@ -182,7 +286,6 @@
         const isSmall = body.hasClass('small');
         const isMedium = body.hasClass('medium');
         const isClosed = body.hasClass(`${side}-sidebar-closed`);
-        const sidebar = side === 'left' ? leftSidebar : rightSidebar;
         const oppositeSide = side === 'left' ? 'right' : 'left';
         const isOppositeClosed = body.hasClass(`${oppositeSide}-sidebar-closed`);
 
@@ -320,6 +423,7 @@
             });
         });
         chatInput.value = "";
+        chatInput.style.height = 'auto';
     }
 
     function waitForElements(numberOfDocuments, callback) {

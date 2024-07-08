@@ -10,11 +10,17 @@ from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-def get_rag_chain(retrieved_doc_nb = 5, params = None):
+def get_rag_chain(params = None):
     default_params = {
-        "CHROMA_ROOT_PATH": CHROMA_ROOT_PATH,
-        "EMBEDDING_MODEL": EMBEDDING_MODEL,
-        "LLM_MODEL": LLM_MODEL,
+        "chroma_root_path": CHROMA_ROOT_PATH,
+        "embedding_model": EMBEDDING_MODEL,
+        "llm_model": LLM_MODEL,
+        "search_type": "similarity",
+        "similarity_doc_nb": 5,
+        "score_threshold": 0.8,
+        "considered_chunk": 25,
+        "mmr_doc_nb": 5,
+        "lambda_mult":0.25,
     }
     if params is None :
         params = default_params
@@ -22,15 +28,29 @@ def get_rag_chain(retrieved_doc_nb = 5, params = None):
         params = {**default_params, **params}
 
     try:
-        embedding_model = get_embedding_function(model_name=EMBEDDING_MODEL)
-        llm = get_llm_function(model_name=LLM_MODEL)
-        db = Chroma(persist_directory=find_chroma_path(model_name=EMBEDDING_MODEL, base_path=CHROMA_ROOT_PATH), embedding_function=embedding_model)
+        required_keys = ["chroma_root_path", "embedding_model", "llm_model"]
+        for key in required_keys:
+            if key not in params:
+                raise NameError(f"Required setting '{key}' not defined.")
+        
+        embedding_model = get_embedding_function(model_name=params["embedding_model"])
+        llm = get_llm_function(model_name=params["llm_model"])
+        db = Chroma(persist_directory=find_chroma_path(model_name=params["embedding_model"], base_path=params["chroma_root_path"]), embedding_function=embedding_model)
+        
+        search_type = params["search_type"]
+        if search_type == "similarity":
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["similarity_doc_nb"]})
+        elif search_type == "similarity_score_threshold":
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"score_threshold": params["score_threshold"]})
+        elif search_type == "mmr":
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["mmr_doc_nb"], "fetch_k": params["considered_chunk"], "lambda_mult": params["lambda_mult"]})
+        else:
+            raise ValueError("Invalid 'search_type' setting")
+        
     except NameError as e:
         variable_name = str(e).split("'")[1]
-        raise NameError (f"The global variable '{variable_name}' is not defined. Please ensure that all required global variables (EMBEDDING_MODEL, LLM_MODEL, CHROMA_ROOT_PATH) are imported or defined.") from e
-    
-    retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": retrieved_doc_nb})
-
+        raise NameError(f"{variable_name} isn't defined")
+         
 
     contextualize_q_system_prompt = """Given a chat history and the latest user question \
     which might reference context in the chat history, formulate a standalone question \
