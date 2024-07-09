@@ -128,7 +128,7 @@
   width: 20px;
   height: 20px;
   margin: 0rem 0.2rem;
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(294deg) brightness(104%) contrast(103%);
+  filter: var(--white-svg);
 }
 .sidebar-left .nav-body .card-body .database-item a{
   color: var(--white);

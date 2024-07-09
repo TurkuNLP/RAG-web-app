@@ -106,7 +106,6 @@ class ConversationalRagChain(Chain):
 
         output = self.rag_chain.invoke({"input": question, "chat_history": chat_history})
         answer,contexts,sources = self.format_outputs(output)
-        #chat_history.extend([HumanMessage(content=question), answer])
 
         self.update_chat_history(question, answer) 
         return {self.output_key: answer, self.context_key: contexts, self.source_key: sources}

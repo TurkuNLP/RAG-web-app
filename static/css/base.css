@@ -93,3 +93,20 @@ html, body {
 .large.right-sidebar-closed {
   padding-right: 0;
 }
+.info-icon {
+  width: 15px;
+  height: 15px;
+  margin: 0rem;
+  margin-right: 0.5rem;
+  filter: var(--white-svg);
+  opacity: 0.5;
+}
+.tooltip-inner {
+  text-align: left;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  max-width: 400px;
+}
+.tooltip {
+  pointer-events: none;
+}

@@ -3,8 +3,7 @@
     const body = $('body');
     const leftBtn = $('#leftSidebarToggle');
     const rightBtn = $('#rightSidebarToggle');
-    const leftSidebar = $('.sidebar-left');
-    const rightSidebar = $('.sidebar-right');
+    const sendBtn = $('#send-btn')
     const blackBackground = $('.black-background');
     const initialWidth = window.innerWidth;
     const databaseDropdown = document.getElementById("collapseDatabase");
@@ -47,8 +46,12 @@
         bindChatEvents();
         ragOptions();
         updateSettings();
+        contextCollapseEvents(1)
         databaseDropdown.classList.add('show');
         settingsDropdown.classList.add('show');
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip({ boundary: 'window' });
+        });
     }
 
     function collapseSidebarsOnLoad() {
@@ -240,6 +243,11 @@
                 }
             });
         });
+        sendBtn.click(() => {
+            if (chatInput.value.trim() != "") {
+                submitQuery();
+            }
+        });
     }
 
     function hideOverlay() {
@@ -413,6 +421,9 @@
         }).done(function(data) {
             chatBox.appendChild(createChatLi(data.response, "incoming"));
             chatBox.scrollTo(0, chatBox.scrollHeight);
+
+            const contextRetriever = document.querySelector('.context-retriever');
+            contextRetriever.innerHTML = '';
 
             for (let i = 0; i < data.context.length; i++) {
                 createContextElement(data.context[i].replace(/\n/g, "<br>"), data.source[i], i+1);
