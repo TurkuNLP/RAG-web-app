@@ -209,25 +209,70 @@
         });
     }
 
-    function ragOptions() {
+    function ragOptions() {    
         searchTypeDropdown.addEventListener('change', function () {
             var similarity = document.getElementById('similarityContent');
             var similarity_score = document.getElementById('similarityScoreContent');
             var mmr = document.getElementById('mmrContent');
-
-            similarity.classList.add('hidden');
-            similarity_score.classList.add('hidden');
-            mmr.classList.add('hidden');
-
-            if (this.value === 'similarity') {
-                similarity.classList.remove('hidden');
-            } else if (this.value === 'similarity_score_threshold') {
-                similarity_score.classList.remove('hidden');
-            } else if (this.value === 'mmr') {
-                mmr.classList.remove('hidden');
+            var elements = [similarity, similarity_score, mmr];
+    
+            function showElement(element) {
+                element.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    element.classList.add('fade-enter');
+                    requestAnimationFrame(() => {
+                        element.classList.add('fade-enter-active');
+                    });
+                });
+    
+                element.addEventListener('transitionend', function handleTransitionEnd1(event) {
+                    if (event.propertyName === 'opacity') {
+                        element.classList.remove('fade-enter', 'fade-enter-active');
+                        element.removeEventListener('transitionend', handleTransitionEnd1);
+                    }
+                });
             }
-        });        
+    
+            function hideElement(element, callback) {
+                element.classList.add('fade-leave');
+                requestAnimationFrame(() => {
+                    element.classList.add('fade-leave-active');
+                });
+    
+                element.addEventListener('transitionend', function handleTransitionEnd(event) {
+                    if (event.propertyName === 'opacity') {
+                        element.classList.remove('fade-leave', 'fade-leave-active');
+                        element.classList.add('hidden');
+                        element.removeEventListener('transitionend', handleTransitionEnd);
+                        if (callback) callback();
+                    }
+                });
+            }
+    
+            // Function to hide all elements and then show the selected one
+            function hideAllAndShowSelected() {
+                var elementsToHide = elements.filter(el => !el.classList.contains('hidden'));
+                var hideCount = elementsToHide.length;
+                var hideCompleteCount = 0;
+    
+                elementsToHide.forEach(el => hideElement(el, () => {
+                    hideCompleteCount++;
+                    if (hideCompleteCount === hideCount) {
+                        if (searchTypeDropdown.value === 'similarity') {
+                            showElement(similarity);
+                        } else if (searchTypeDropdown.value === 'similarity_score_threshold') {
+                            showElement(similarity_score);
+                        } else if (searchTypeDropdown.value === 'mmr') {
+                            showElement(mmr);
+                        }
+                    }
+                }));
+            }
+    
+            hideAllAndShowSelected();
+        });
     }
+
 
     function bindChatEvents() {
         $(document).ready(function() {

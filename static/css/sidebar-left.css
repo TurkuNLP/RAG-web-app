@@ -146,13 +146,34 @@
   border: 0.05rem solid #ffffff3a;
   border-radius: 1rem;
   margin-bottom: 0.5rem;
+  opacity: 1;
 }
 .sidebar-left .nav-body .card-body .settings-item select#searchTypeDropdown {
   margin-bottom: 1rem;
 }
+/* Transition */
 .sidebar-left .nav-body .card-body .settings-item .hidden {
   display: none;
 }
+.fade-enter {
+  transition: opacity 0.3s ease-in;
+}
+.fade-leave {
+  transition: opacity 0.3s ease-out;
+}
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+}
+.fade-leave {
+  opacity: 1;
+}
+.fade-leave-active {
+  opacity: 0;
+}
+/* End Transition */
 .sidebar-left .nav-body .card-body .settings-item.last-item {
   margin-bottom: 0rem;
 }
