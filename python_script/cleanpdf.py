@@ -16,19 +16,20 @@ def extract_text_from_pdf(pdf_path):
         page = doc.load_page(page_num)
         page_text = page.get_text("text")
 
-        if pdf_path.split('/')[-1].find('RA_2009_1') == 0 or \
-            pdf_path.split('/')[-1].find('RA_2009_2') == 0 or \
-            pdf_path.split('/')[-1].find('RA_2009_3') == 0:
+        # if it is an image or pdf belonging before 2007
+        if pdf_path.split('/')[-1].find('2003') == 0 or \
+            pdf_path.split('/')[-1].find('2002') == 0 or \
+            pdf_path.split('/')[-1].find('2001') == 0:
             
             image = page.get_pixmap()
             pix = page.get_pixmap(matrix=image)
         
             # Convert the pixmap object to a PIL image object
             img = Image.open(io.BytesIO(pix.tobytes()))
-            
-            # Use pytesseract to do OCR on the image
-            page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
-            print(pdf_path.split('/')[-1], page_num)
+        
+        # Use pytesseract to do OCR on the image
+        page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
+        print(pdf_path.split('/')[-1], page_num)
         lines = page_text.split('\n')
         
         paragraph = ""
@@ -130,7 +131,7 @@ def process_directory(input_dir, output_dir):
     
             save_text_to_docx(texts, output_base + document_title)
 
-def merge_docx_files(input_dir, output_path, max_chars=980000):
+def merge_docx_files(input_dir, output_path, max_chars=1000000):
     def get_docx_files(directory):
         return [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.docx')]
 
@@ -167,12 +168,13 @@ def merge_docx_files(input_dir, output_path, max_chars=980000):
     if current_composer:
         current_composer.save(f"{output_path}_{doc_num:02d}.docx")
 
-# Spécifiez les chemins du répertoire d'entrée et de sortie
-input_dir = "/home/mtebad/projects/RAG-web-app/data"
-output_dir = "/home/mtebad/projects/RAG-web-app/data/output2"
+# Specify the input and output directory paths
+input_dir = "/home/mtebad/projects/RAG-web-app/data/russian_data"
+output_dir = "/home/mtebad/projects/RAG-web-app/data/output"
 
-# Traiter tous les fichiers PDF dans le répertoire d'entrée
-#process_directory(input_dir, output_dir)
+# changes pdfs to docx
+process_directory(input_dir, output_dir)
+# merges docx files
 merge_docx_files(output_dir, os.path.join('/home/mtebad/projects/RAG-web-app/data/output', "merged_document"))
 
 print("Traitement terminé avec succès.")
