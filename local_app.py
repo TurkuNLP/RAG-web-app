@@ -78,7 +78,6 @@ def update_settings():
     return jsonify({'status': 'success', 'message': 'Settings updated successfully'}), 200
 
 
-
 def get_Chat_response(query):
     inputs = {
     "query": str(query),
@@ -93,6 +92,10 @@ def get_Chat_response(query):
     })
     return output
 
+@local_app.route('/clear_chat_history', methods=['POST'])
+def clear_chat_history():
+    rag_conv.clear_chat_history()
+    return jsonify({"status": "success"}), 200
 
 if __name__ == '__main__':
     init_app()

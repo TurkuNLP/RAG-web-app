@@ -99,9 +99,14 @@ class ConversationalRagChain(Chain):
         self.chat_history.append({"role": "user", "content": user_question})
         self.chat_history.append({"role": "ai", "content": bot_response})
 
+    def clear_chat_history(self):
+        """Clear chat history"""
+        self.chat_history = []
+
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         """Call the chain. Return a dict with answer, context and source"""
         chat_history = self.chat_history
+        print(chat_history)
         question = inputs[self.input_key]
 
         output = self.rag_chain.invoke({"input": question, "chat_history": chat_history})

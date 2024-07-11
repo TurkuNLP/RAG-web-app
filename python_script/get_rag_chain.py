@@ -21,6 +21,7 @@ def get_rag_chain(params = None):
         "considered_chunk": 25,
         "mmr_doc_nb": 5,
         "lambda_mult":0.25,
+        "isHistoryOn": True,
     }
     if params is None :
         params = default_params
@@ -51,23 +52,27 @@ def get_rag_chain(params = None):
         variable_name = str(e).split("'")[1]
         raise NameError(f"{variable_name} isn't defined")
          
+    if params["isHistoryOn"]:
+        contextualize_q_system_prompt = """Given a chat history and the latest user question \
+        which might reference context in the chat history, formulate a standalone question \
+        which can be understood without the chat history. Do NOT answer the question, \
+        just reformulate it if needed and otherwise return it as is."""
 
-    contextualize_q_system_prompt = """Given a chat history and the latest user question \
-    which might reference context in the chat history, formulate a standalone question \
-    which can be understood without the chat history. Do NOT answer the question, \
-    just reformulate it if needed and otherwise return it as is."""
+        contextualize_q_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", contextualize_q_system_prompt),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
 
-    contextualize_q_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ]
-    )
-
-    history_aware_retriever = create_history_aware_retriever(
-        llm, retriever, contextualize_q_prompt
-    )
+        history_aware_retriever = create_history_aware_retriever(
+            llm, retriever, contextualize_q_prompt
+        )
+        retriever = history_aware_retriever
+        print("history on")
+    else:
+        print("history off")
 
     qa_system_prompt = """You are an assistant for question-answering tasks. \
     Use the following pieces of retrieved context to answer the question. \
@@ -85,6 +90,6 @@ def get_rag_chain(params = None):
 
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
 
-    rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
     return rag_chain

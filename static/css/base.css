@@ -110,3 +110,9 @@ html, body {
 .tooltip {
   pointer-events: none;
 }
+.btn-menu {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+}

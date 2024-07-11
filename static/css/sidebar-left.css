@@ -4,7 +4,9 @@
   --white-svg: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(0%) hue-rotate(161deg) brightness(101%) contrast(104%);
   --black-svg: brightness(0) saturate(100%);
   --primary-color: #455dc7;
+  --primary-color-svg: brightness(0) saturate(100%) invert(39%) sepia(15%) saturate(6445%) hue-rotate(213deg) brightness(81%) contrast(91%);
   --primary-color-light: #5b72d6;
+  --primary-color-light-svg : brightness(0) saturate(100%) invert(49%) sepia(28%) saturate(5650%) hue-rotate(211deg) brightness(89%) contrast(86%);
 }
 
 /* Left Sidebar Specific Styles */
@@ -66,7 +68,7 @@
   font-size: 1rem;
   width: 100%;
 }
-.sidebar-left .nav-body .database-header {
+.sidebar-left .nav-body .database-header, .sidebar-left .nav-body .history-header {
   margin-top: 0.5rem;
 }
 .sidebar-left .nav-body .card-header.collapse-open {
@@ -89,33 +91,62 @@
   margin-left: 1rem;
   margin-right: 1.5rem;
 }
-.sidebar-left .nav-body .btn {
+/* Btn & icon Settings/HIstory/Database */
+.sidebar-left .nav-body .btn-menu {
   width: 100%;
   padding: 0;
   box-sizing: border-box;
   border: 0.7rem solid transparent;
 }
-.sidebar-left .nav-body .btn:focus {
+.sidebar-left .nav-body .btn-menu:focus {
   box-shadow: none;
 }
-.sidebar-left .nav-body .btn.doc {
+.sidebar-left .nav-body .btn-menu.doc {
   width: auto;
 }
-.sidebar-left .nav-body .btn {
+.sidebar-left .nav-body .btn-menu {
   border-left: 0 !important;
 }
-.sidebar-left .nav-body .btn-link {
+.sidebar-left .nav-body .btn-menu {
   color: transparent;
+}
+/* Clear btn */
+.sidebar-left .nav-body .clear-btn {
+  color: white;
+  border: 0.1rem solid white;
+  border-radius: 1rem;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.sidebar-left .nav-body .clear-btn:hover {
+  color: var(--primary-color-light);
+  background-color: var(--white);
+}
+.sidebar-left .nav-body .clear-btn:hover .icon {
+  filter: var(--primary-color-light-svg);
+}
+.sidebar-left .nav-body .clear-btn li{
+  padding: 0.5rem;
+}
+.sidebar-left .nav-body .clear-btn .icon {
+  width: 20px;
+  margin: 0 0.5rem;
+}
+.sidebar-left .nav-body .form-check {
+  padding-bottom: 0.5rem;
 }
 .sidebar-left .nav-body .card-body {
   background-color: var(--primary-color-light);
   padding: 0.5rem 0.5rem;
+  padding-top: 0;
   position: relative;
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
 }
 .sidebar-left .nav-body .card-body.database {
-  padding: 0.5rem 0rem;
+  padding-bottom: 0.5rem;
 }
 .sidebar-left .nav-body .card-body .database-item {
   white-space: nowrap;
@@ -149,7 +180,8 @@
   opacity: 1;
 }
 .sidebar-left .nav-body .card-body .settings-item select#searchTypeDropdown {
-  margin-bottom: 1rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.7rem;
 }
 /* Transition */
 .sidebar-left .nav-body .card-body .settings-item .hidden {
@@ -230,6 +262,13 @@
   align-items: center !important;
 }
 
-.sidebar-left .custom-select {
+.sidebar-left .form-select {
   border-radius: 1rem;
+  padding: 0.3rem 1rem;
+  color: var(--primary-color-light);
+  
+}
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
