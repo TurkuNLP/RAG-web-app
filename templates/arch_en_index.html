@@ -26,104 +26,145 @@
         <div class="nav-header">
             <li class="nav-item logo-holder">
                 <div class="text-center text-white logo">
-                    <a class="text-white float-left" id="sidebarToggleHolder" href="#">
+                    <a class="text-white float-start" id="sidebarToggleHolder" href="#">
                         <img src="arch-en/{{ url_for('static', filename='img/menu.svg') }}" alt="menubar" class="icon" id="leftSidebarToggle">
                     </a>
-                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Russian Archeology - English version</strong></a>
+                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Sidebar</strong></a>
                 </div>
             </li>
         </div>
         <div class="nav-body">
             <div class="accordion">
-                <div class="card-header settings-header collapse-open">
-                    <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseSettings" aria-expanded="false" aria-controls="collapseSettings">
-                        <span class="float-left">
-                            <img src="arch-en/{{ url_for('static', filename='img/setting.svg') }}" alt="setting button" class="icon">Settings
-                        </span>
-                        <i class="fas fa-caret-down float-right"></i>
-                    </button>
-                </div>
-                <div id="collapseSettings" class="collapse" aria-labelledby="settingsHeader">
-                    <div class="card-body text-white text-justify settings">
-                        <li class="settings-item">
-                            <label for="searchTypeDropdown"><img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-toggle="tooltip" data-html="true" data-placement="right" 
-                                title="Defines the type of search the Retriever should perform. Options are: <br>
-                                - 'similarity': finds the most similar documents<br>
-                                - 'mmr': maximizes relevance and diversity<br>
-                                - 'similarity_score_threshold': retrieves documents above a certain relevance score.">
-                                Search type:
-                            </label>
-                            <select class="custom-select" id="searchTypeDropdown">
-                                <option value="similarity">Similarity</option>
-                                <option value="similarity_score_threshold">Similarity score threshold</option>
-                                <option value="mmr">MMR</option>
-                            </select>
-                            
-                            <div id="similarityContent" class="">
-                                <div class="slider-value"><img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-toggle="tooltip" data-placement="right" title="Amount of documents to return">Number of retrieved chunks: <span id="similaritySliderValue">1</span></div>
-                                <div class="slider-container">
-                                    <span id="minValue">1</span>
-                                    <input type="range" class="form-control-range" id="similaritySlider" min="1" max="30" step="1">
-                                    <span id="maxValue">30</span>
+                <div class="card">
+                    <div class="card-header settings-header collapse-open" id="settingsHeader">
+                        <button class="btn btn-menu text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="true" aria-controls="collapseSettings">
+                            <span class="float-start">
+                                <img src="arch-en/{{ url_for('static', filename='img/setting.svg') }}" alt="setting button" class="icon">Settings
+                            </span>
+                            <i class="fas fa-caret-down float-end"></i>
+                        </button>
+                    </div>
+                    <div id="collapseSettings" class="collapse show" aria-labelledby="settingsHeader">
+                        <div class="card-body text-white text-justify settings">
+                            <li class="settings-item">
+                                <label for="searchTypeDropdown">
+                                    <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Defines the type of search the Retriever should perform. Options are: <br>
+                                    - 'similarity': finds the most similar documents<br>
+                                    - 'mmr': maximizes relevance and diversity<br>
+                                    - 'similarity_score_threshold': retrieves documents above a certain relevance score.">
+                                    Search type:
+                                </label>
+                                <select class="form-select" id="searchTypeDropdown">
+                                    <option value="similarity">Similarity</option>
+                                    <option value="similarity_score_threshold">Similarity score threshold</option>
+                                    <option value="mmr">MMR</option>
+                                </select>
+                                
+                                <div id="similarityContent">
+                                    <div class="slider-value">
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Amount of documents to return">Number of retrieved chunks: <span id="similaritySliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="similaritySlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div id="similarityScoreContent" class="hidden">
-                                <div class="slider-value"><img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-toggle="tooltip" data-placement="right" title="Minimum relevance threshold to fetch documents">Similarity score required: <span id="similarityScoreSliderValue">1</span>%</div>
-                                <div class="slider-container">
-                                    <span id="minValue">1%</span>
-                                    <input type="range" class="form-control-range" id="similarityScoreSlider" min="1" max="100" step="1">
-                                    <span id="maxValue">100%</span>
+                                
+                                <div id="similarityScoreContent" class="hidden">
+                                    <div class="slider-value">
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Minimum relevance threshold to fetch documents">Similarity score required: <span id="similarityScoreSliderValue">1</span>%
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1%</span>
+                                        <input type="range" class="form-range" id="similarityScoreSlider" min="1" max="100" step="1">
+                                        <span id="maxValue">100%</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div id="mmrContent" class="hidden">
-                                <div class="slider-value"><img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-toggle="tooltip" data-html="true" data-placement="right" title="Fetch more documents for the MMR algorithm to consider <br>Only return the top documents based on the amount defined bellow">Considered chunks: <span id="consideredChunkSliderValue">1</span></div>
-                                <div class="slider-container">
-                                    <span id="minValue">1</span>
-                                    <input type="range" class="form-control-range" id="consideredChunkSlider" min="1" max="30" step="1">
-                                    <span id="maxValue">30</span>
+                                <div id="mmrContent" class="hidden">
+                                    <div class="slider-value">
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Fetch more documents for the MMR algorithm to consider <br>Only return the top documents based on the amount defined below">Considered chunks: <span id="consideredChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="consideredChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
+                                    <div class="slider-value">
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Define the amount of document to return">Retrieved chunks: <span id="retrievedChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="retrievedChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
+                                    <div class="slider-value">
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Diversity of results returned by MMR<br>1 for minimum diversity and 0 for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1%</span>
+                                        <input type="range" class="form-range" id="lambdaSlider" min="1" max="100" step="1">
+                                        <span id="maxValue">100%</span>
+                                    </div>
                                 </div>
-                                <div class="slider-value"><img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-toggle="tooltip" data-placement="right" title="Define the amount of document to return">Retrieved chunks: <span id="retrievedChunkSliderValue">1</span></div>
-                                <div class="slider-container">
-                                    <span id="minValue">1</span>
-                                    <input type="range" class="form-control-range" id="retrievedChunkSlider" min="1" max="30" step="1">
-                                    <span id="maxValue">30</span>
-                                </div>
-                                <div class="slider-value"><img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-toggle="tooltip" data-html="true" data-placement="right" title="Diversity of results returned by MMR<br>1 for minimum diversity and 0 for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%</div>
-                                <div class="slider-container">
-                                    <span id="minValue">1%</span>
-                                    <input type="range" class="form-control-range" id="lambdaSlider" min="1" max="100" step="1">
-                                    <span id="maxValue">100%</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="settings-item">
-                            <label for="embeddingModelDropdown">Embedding model:</label>
-                            <select class="custom-select" id="embeddingModelDropdown">
-                                <option value="voyage-law-2">Voyage Law 2</option>
-                                <option value="voyage-multilingual-2">Voyage Multilingual 2</option>
-                            </select>
-                        </li>
-                        <li class="settings-item last-item">
-                            <label for="llmModelDropdown">LLM model:</label>
-                            <select class="custom-select" id="llmModelDropdown">
-                                <option value="gpt-3.5-turbo">ChatGPT 3.5</option>
-                            </select>
-                        </li>
+                            </li>
+                            <li class="settings-item">
+                                <label for="embeddingModelDropdown">Embedding model:</label>
+                                <select class="form-select" id="embeddingModelDropdown">
+                                    <option value="openai">Openai</option>
+                                    <option value="voyage-law-2">Voyage Law 2</option>
+                                    <option value="voyage-multilingual-2">Voyage Multilingual 2</option>
+                                </select>
+                            </li>
+                            <li class="settings-item last-item">
+                                <label for="llmModelDropdown">LLM model:</label>
+                                <select class="form-select" id="llmModelDropdown">
+                                    <option value="gpt-3.5-turbo">ChatGPT 3.5</option>
+                                    <option value="nvidia/Llama3-ChatQA-1.5-8B">Llama3 ChatQA 1.5 8B</option>
+                                    <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral 8x7B Instruct v0</option>
+                                    <option value="mistralai/Mistral-7B-Instruct-v0.1">Mistral 7B Instruct v0.1</option>
+                                </select>
+                            </li>
+                        </div>
                     </div>
                 </div>
-                <div class="card-header database-header collapse-open">
-                    <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseDatabase" aria-expanded="false" aria-controls="collapseDatabase">
-                        <span class="float-left">
-                            <img src="arch-en/{{ url_for('static', filename='img/folder.svg') }}" alt="database button" class="icon">Database
-                        </span>
-                        <i class="fas fa-caret-down float-right"></i>
-                    </button>
+                <div class="card">
+                    <div class="card-header history-header collapse-open" id="historyHeader">
+                        <button class="btn btn-menu text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory" aria-expanded="false" aria-controls="collapseHistory">
+                            <span class="float-start">
+                                <img src="arch-en/{{ url_for('static', filename='img/message-multiple.svg') }}" alt="chat history" class="icon">Chat History
+                            </span>
+                            <i class="fas fa-caret-down float-end"></i>
+                        </button>
+                    </div>
+                    <div id="collapseHistory" class="collapse" aria-labelledby="historyHeader">
+                        <div class="card-body text-white text-justify history">
+                            <li class="history-items">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="flexSwitchHistory" checked>
+                                    <label class="form-check-label" for="flexSwitchHistory">Activate Chat History</label>
+                                </div>
+                            </li>
+                            <li class="history-items">
+                                <button class="btn clear-btn" id="clear-btn" type="button"><img src="arch-en/{{ url_for('static', filename='img/delete.svg') }}" alt="delete" class="icon">Clear Chat History</button>
+                            </li>
+                        </div>
+                    </div>
                 </div>
-                <div id="collapseDatabase" class="collapse" aria-labelledby="databaseHeader">
-                    <div class="card-body text-white text-justify database">
-                        <div class="shadeoverlay"></div>
+                <div class="card">
+                    <div class="card-header database-header collapse-open" id="databaseHeader">
+                        <button class="btn btn-menu text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDatabase" aria-expanded="false" aria-controls="collapseDatabase">
+                            <span class="float-start">
+                                <img src="arch-en/{{ url_for('static', filename='img/folder.svg') }}" alt="database button" class="icon">Database
+                            </span>
+                            <i class="fas fa-caret-down float-end"></i>
+                        </button>
+                    </div>
+                    <div id="collapseDatabase" class="collapse" aria-labelledby="databaseHeader">
+                        <div class="card-body text-white text-justify database">
+                            <div class="shadeoverlay"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,16 +187,14 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Turku NLP RAG</span>
                     </div>
-                    <div class="card-body flex-grow-1" data-mdb-perfect-scrollbar-init>
+                    <div class="card-body flex-grow-1" data-perfect-scrollbar-init>
                         <ul class="chatbox list-unstyled">
-                            <li class="message incoming">Message inc</li>
-                            <li class="message outcoming">Message out</li>
                         </ul>
                     </div>
                     <div class="card-footer text-muted d-flex justify-content-start align-items-center">
                         <div class="chat-input-container">
                             <textarea id="chatInput" class="form-control" placeholder="Type message" rows="1"></textarea>
-                            <button class="btn ml-2 send-btn" id="send-btn">
+                            <button class="btn ms-2 send-btn" id="send-btn">
                                 <img src="arch-en/{{ url_for('static', filename='img/sent.svg') }}" alt="send button" class="icon">
                             </button>
                         </div>
@@ -171,7 +210,7 @@
             <li class="nav-item logo-holder">
                 <div class="text-center text-white logo">
                     <a class="text-white text-decoration-none" id="title" href="#"><strong>Context Menu</strong></a>
-                    <a class="text-white float-right" id="sidebarToggleHolder" href="#">
+                    <a class="text-white float-end" id="sidebarToggleHolder" href="#">
                         <img src="arch-en/{{ url_for('static', filename='img/menu.svg') }}" alt="menubar" class="icon" id="rightSidebarToggle">
                     </a>
                 </div>
@@ -180,9 +219,9 @@
         <div class="nav-body">
             <div class="accordion context-retriever">
                 <div class="card-header collapse-open" id="heading1">
-                    <a href="" target="_blank"><img class="icon download-icon" src="arch-en/{{ url_for('static', filename='img/alert-diamond.svg') }}"></a>
-                    <button class="btn btn-link text-white context" type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="#collapse1">
-                        <span class="float-left mx-2">The different retrieved text chunks will appear in this menu</span><i class="fas fa-caret-down float-right"></i>
+                    <a><img class="icon download-icon" src="arch-en/{{ url_for('static', filename='img/alert-diamond.svg') }}"></a>
+                    <button class="btn btn-menu text-white context" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                        <span class="float-start mx-2">The different retrieved text chunks will appear in this menu</span><i class="fas fa-caret-down float-end"></i>
                     </button>
                 </div>
                 <div id="collapse1" class="collapse show" aria-labelledby="heading1">
@@ -195,8 +234,7 @@
         </div>
     </ul>
 
-    <script src="arch-en/{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-    <script src="arch-en/{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="arch-en/{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="arch-en/{{ url_for('static', filename='js/arch_en_script.js') }}"></script>
 </body>
 

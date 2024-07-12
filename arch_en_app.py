@@ -26,6 +26,7 @@ def init_app():
     load_rag()
     arch_en.config['UPLOAD_FOLDER'] = DATA_PATH
 
+
 def load_rag(settings = None):    
 
     global rag_conv
@@ -42,12 +43,14 @@ def load_rag(settings = None):
             callbacks=None
         )
 
+
 # Route to get the document list
 @arch_en.route('/documents', methods=['GET'])
 def list_documents():
     files = os.listdir(arch_en.config['UPLOAD_FOLDER'])
     documents = [{"name": f, "url": f"/arch-en/files/{f}", "extension":os.path.splitext(f)[1][1:]} for f in files]
     return jsonify(documents)
+
 
 # Route to get a single document
 @arch_en.route('/documents/<document_name>', methods=['GET'])
@@ -62,26 +65,18 @@ def get_document(document_name):
     
     return jsonify(document)
 
+
 # Route to show the pdf
 @arch_en.route('/files/<filename>', methods=['GET'])
 def serve_file(filename):
     return send_from_directory(arch_en.config['UPLOAD_FOLDER'], filename)
 
 
-
 @arch_en.route("/get", methods=["POST"])
 def chat():
-    msg = request.form.get("msg","")
-    input = msg
-    return get_Chat_response(input)
-
-@arch_en.route('/update-settings', methods=['POST'])
-def update_settings():
     data = request.get_json()
-    load_rag(settings=data)
-    return jsonify({'status': 'success', 'message': 'Settings updated successfully'}), 200
-
-
+    msg = data.get("msg", "")
+    return get_Chat_response(msg)
 
 def get_Chat_response(query):
     inputs = {
@@ -96,6 +91,19 @@ def get_Chat_response(query):
         'source': res['source']
     })
     return output
+
+
+@arch_en.route('/update-settings', methods=['POST'])
+def update_settings():
+    data = request.get_json()
+    load_rag(settings=data)
+    return jsonify({'status': 'success', 'message': 'Settings updated successfully'}), 200
+
+
+@arch_en.route('/clear_chat_history', methods=['POST'])
+def clear_chat_history():
+    rag_conv.clear_chat_history()
+    return jsonify({"status": "success"}), 200
 
 
 if __name__ == '__main__':

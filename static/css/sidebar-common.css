@@ -55,6 +55,13 @@
   padding: 1.5rem;
 }
 
+.left-sidebar-closed .sidebar-left .logo,
+.right-sidebar-closed .sidebar-right .logo,
+.left-sidebar-closed .sidebar-left .nav-body,
+.right-sidebar-closed .sidebar-right .nav-body {
+  display: contents;
+}
+
 .sidebar-left .nav-link:hover,
 .sidebar-right .nav-link:hover,
 .sidebar-left .nav-link.active,

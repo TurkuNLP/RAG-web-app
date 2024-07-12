@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialization
     function init() {
         initSettings(5, 90, 25, 5, 25);
+        clearChatHistory(onLoad = true);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
         bindEvents();
@@ -88,16 +89,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function contextCollapseEvents(numberOfDocuments) {
-        console.log(numberOfDocuments);
         for (let i = 1; i <= numberOfDocuments; i++) {
             const collapseId = `collapse${i}`;
             const headingId = `heading${i}`;
             const collapseElement = document.getElementById(collapseId);
             const headingElement = document.getElementById(headingId);
-            console.log(collapseElement);
-            console.log(headingElement);
             if (collapseElement && headingElement) {
-                console.log("true");
                 collapseElement.addEventListener('show.bs.collapse', () => {
                     headingElement.classList.add('collapse-open');
                 });
@@ -237,8 +234,6 @@ document.addEventListener("DOMContentLoaded", function() {
             lambda_mult: parseInt(lambdaSlider.value, 10) / 100,
             isHistoryOn : historySwitchBtn.checked
         };
-
-        console.log(rag_settings);
         fetch("/update-settings", {
             method: "POST",
             headers: {
@@ -439,7 +434,7 @@ document.addEventListener("DOMContentLoaded", function() {
         cardHeader.id = `heading${contextNumber}`;
 
         const span = document.createElement('span');
-        span.className = 'float-left mx-2';
+        span.className = 'float-start mx-2';
 
         const doc = await fetchDocument(source);
         if (doc) {
@@ -462,7 +457,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const contextButton = document.createElement('button');
-        contextButton.className = 'btn btn-link text-white context';
+        contextButton.className = 'btn btn-menu text-white context';
         contextButton.type = 'button';
         contextButton.setAttribute('data-bs-toggle', 'collapse');
         contextButton.setAttribute('data-bs-target', `#collapse${contextNumber}`);
@@ -470,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function() {
         contextButton.setAttribute('aria-controls', `collapse${contextNumber}`);
 
         const caretIcon = document.createElement('i');
-        caretIcon.className = 'fas fa-caret-down float-right';
+        caretIcon.className = 'fas fa-caret-down float-end';
 
         contextButton.appendChild(span);
         contextButton.appendChild(caretIcon);
@@ -521,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function() {
         chatInput.style.height = 'auto';
     }
 
-    function clearChatHistory() {
+    function clearChatHistory(onLoad = false) {
         fetch('/clear_chat_history', {
             method: 'POST',
             headers: {
@@ -530,9 +525,11 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
+            if (!onLoad) {
             const contextRetriever = document.querySelector('.context-retriever');
             contextRetriever.innerHTML = '';
             chatBox.innerHTML = '';
+            }
         })
         .catch((error) => {
             console.error('Error:', error);

@@ -67,18 +67,12 @@ def index():
 
 @local_app.route("/get", methods=["POST"])
 def chat():
-    msg = request.form.get("msg","")
-    input = msg
-    return get_Chat_response(input)
-
-@local_app.route('/update-settings', methods=['POST'])
-def update_settings():
     data = request.get_json()
-    load_rag(settings=data)
-    return jsonify({'status': 'success', 'message': 'Settings updated successfully'}), 200
-
+    msg = data.get("msg", "")
+    return get_Chat_response(msg)
 
 def get_Chat_response(query):
+    print("query: ",str(query))
     inputs = {
     "query": str(query),
     "chat_history": []
@@ -90,7 +84,16 @@ def get_Chat_response(query):
         'context': res['context'],
         'source': res['source']
     })
+    print(res['result'])
     return output
+
+@local_app.route('/update-settings', methods=['POST'])
+def update_settings():
+    data = request.get_json()
+    load_rag(settings=data)
+    return jsonify({'status': 'success', 'message': 'Settings updated successfully'}), 200
+
+
 
 @local_app.route('/clear_chat_history', methods=['POST'])
 def clear_chat_history():
