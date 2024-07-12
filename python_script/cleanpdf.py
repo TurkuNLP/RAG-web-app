@@ -27,8 +27,9 @@ def extract_text_from_pdf(pdf_path):
             # Convert the pixmap object to a PIL image object
             img = Image.open(io.BytesIO(pix.tobytes()))
         
-        # Use pytesseract to do OCR on the image
-        page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
+            # Use pytesseract to do OCR on the image
+            page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
+            
         print(pdf_path.split('/')[-1], page_num)
         lines = page_text.split('\n')
         
