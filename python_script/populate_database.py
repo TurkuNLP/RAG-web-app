@@ -7,6 +7,7 @@ from langchain.schema.document import Document
 
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain.document_loaders.pdf import PyPDFLoader
+from langchain.document_loaders.pdf import PDFPlumberLoader
 from typing import List, Union
 from pathlib import Path
 import logging
@@ -76,16 +77,19 @@ def load_documents():
     try:
         llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
         for doc in tqdm(llama_document_loader.load_data(), desc="TXT/DOCX loaded"):
+            doc.metadata.pop('file_path',None)
+            print(doc.metadata)
             llama_documents.append(doc)
     except ValueError as e:
         print(e)
 
     langchain_document_loader = ProgressPyPDFDirectoryLoader(DATA_PATH)
     for doc in tqdm(langchain_document_loader.load(), desc="PDFs loaded"):
+        print(doc.metadata)
         langchain_documents.append(doc)
 
     documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
-    print(f"Loaded {len(langchain_documents)} PDF documents, {len(llama_documents)} TXT/DOCX documents, {len(documents)} total documents.")
+    print(f"Loaded {len(langchain_documents)} chunks from PDF documents, {len(llama_documents)} chunks from TXT/DOCX documents.\nTotal chunks: {len(documents)}.\n")
     return documents
 
 def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
@@ -94,8 +98,7 @@ def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
     """
     langchain_docs = []
     for doc in documents:
-        metadata = {"source" : doc.metadata["file_name"], "page" : "N/A"}
-        langchain_docs.append(Document(page_content=doc.text, metadata=metadata))
+        langchain_docs.append(Document(page_content=doc.text, metadata=doc.metadata))
     return langchain_docs
 
 def split_documents(documents: list[Document]):
@@ -159,7 +162,7 @@ def calculate_chunk_ids(chunks):
     current_chunk_index = 0
 
     for chunk in chunks:
-        source = chunk.metadata.get("source")
+        source = chunk.metadata.get("file_name")
         page = str(chunk.metadata.get("page"))
         current_page_id = f"{source}:p{page}"
 
@@ -232,10 +235,14 @@ class ProgressPyPDFDirectoryLoader(PyPDFDirectoryLoader):
                 if i.is_file():
                     if self._is_visible(i.relative_to(p)) or self.load_hidden:
                         try:
-                            loader = PyPDFLoader(str(i), extract_images=self.extract_images)
+                            loader = PDFPlumberLoader(str(i), extract_images=self.extract_images)
                             sub_docs = loader.load()
                             for doc in sub_docs:
-                                doc.metadata["source"] = i.name
+                                if 'source' in doc.metadata:
+                                    doc.metadata['source'] = i.name
+                                    doc.metadata['file_name'] = doc.metadata.pop('source')
+                                doc.metadata.pop('file_path',None)
+                                doc.metadata = {key: value for key, value in doc.metadata.items() if value}
                             docs.extend(sub_docs)
                         except Exception as e:
                             if self.silent_errors:

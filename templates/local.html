@@ -82,6 +82,14 @@
                                         <input type="range" class="form-range" id="similarityScoreSlider" min="1" max="100" step="1">
                                         <span id="maxValue">100%</span>
                                     </div>
+                                    <div class="slider-value">
+                                        <img src="{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Max amount of documents to return">Max number of retrieved chunks: <span id="maxChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="maxChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
                                 </div>
 
                                 <div id="mmrContent" class="hidden">

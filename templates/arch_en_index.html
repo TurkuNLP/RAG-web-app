@@ -29,7 +29,7 @@
                     <a class="text-white float-start" id="sidebarToggleHolder" href="#">
                         <img src="arch-en/{{ url_for('static', filename='img/menu.svg') }}" alt="menubar" class="icon" id="leftSidebarToggle">
                     </a>
-                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Sidebar</strong></a>
+                    <a class="text-white text-decoration-none" id="title" href="#"><strong></strong></a>
                 </div>
             </li>
         </div>
@@ -80,6 +80,14 @@
                                         <input type="range" class="form-range" id="similarityScoreSlider" min="1" max="100" step="1">
                                         <span id="maxValue">100%</span>
                                     </div>
+                                    <div class="slider-value">
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Max amount of documents to return">Max number of retrieved chunks: <span id="maxChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="maxChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
                                 </div>
 
                                 <div id="mmrContent" class="hidden">
@@ -100,11 +108,11 @@
                                         <span id="maxValue">30</span>
                                     </div>
                                     <div class="slider-value">
-                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Diversity of results returned by MMR<br>1 for minimum diversity and 0 for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%
+                                        <img src="arch-en/{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Diversity of results returned by MMR<br>100% for minimum diversity and 0% for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%
                                     </div>
                                     <div class="slider-container">
-                                        <span id="minValue">1%</span>
-                                        <input type="range" class="form-range" id="lambdaSlider" min="1" max="100" step="1">
+                                        <span id="minValue">0%</span>
+                                        <input type="range" class="form-range" id="lambdaSlider" min="0" max="100" step="1">
                                         <span id="maxValue">100%</span>
                                     </div>
                                 </div>
@@ -121,9 +129,6 @@
                                 <label for="llmModelDropdown">LLM model:</label>
                                 <select class="form-select" id="llmModelDropdown">
                                     <option value="gpt-3.5-turbo">ChatGPT 3.5</option>
-                                    <option value="nvidia/Llama3-ChatQA-1.5-8B">Llama3 ChatQA 1.5 8B</option>
-                                    <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral 8x7B Instruct v0</option>
-                                    <option value="mistralai/Mistral-7B-Instruct-v0.1">Mistral 7B Instruct v0.1</option>
                                 </select>
                             </li>
                         </div>
@@ -143,7 +148,7 @@
                             <li class="history-items">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="flexSwitchHistory" checked>
-                                    <label class="form-check-label" for="flexSwitchHistory">Activate Chat History</label>
+                                    <label class="form-check-label" for="flexSwitchHistory">Activate Chat History Memory</label>
                                 </div>
                             </li>
                             <li class="history-items">
@@ -171,10 +176,12 @@
         </div>
         <div class="nav-footer">
             <li class="nav-item">
+                <!-- Add footer content if necessary
                 <a class="nav-link text-left text-white py-1 px-0" href="#">
                     <img src="arch-en/{{ url_for('static', filename='img/logout.svg') }}" alt="logout button" class="icon mx-3">
                     <span class="text-nowrap mx-2">Log out</span>
                 </a>
+                -->
             </li>
         </div>
     </ul>
@@ -225,7 +232,7 @@
                     </button>
                 </div>
                 <div id="collapse1" class="collapse show" aria-labelledby="heading1">
-                    <div class="card-body text-white text-justify">You can show or hide each text chunk by clicking on it.<br>You can also view and/or download the document to which the text section belongs by clicking the download button.</div>
+                    <div class="card-body text-white text-justify">You can show or hide each text chunk by clicking on it.<br>You can also view and/or download the document to which the text chunk belongs by clicking the download button.</div>
                 </div>
             </div>
         </div>

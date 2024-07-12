@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const similarityScoreSlider = document.getElementById('similarityScoreSlider');
     const similarityScoreSliderValue = document.getElementById('similarityScoreSliderValue');
+    const maxChunkSlider = document.getElementById('maxChunkSlider');
+    const maxChunkSliderValue = document.getElementById('maxChunkSliderValue');
     
     const consideredChunkSlider = document.getElementById('consideredChunkSlider');
     const consideredChunkSliderValue = document.getElementById('consideredChunkSliderValue');
@@ -37,11 +39,10 @@ document.addEventListener("DOMContentLoaded", function() {
     let rightWasOpen = true;
     let leftWasOpen = true;
     let resizeTimeout;
-    let numberOfDocuments = 0;
 
     // Initialization
     function init() {
-        initSettings(5, 90, 25, 5, 25);
+        initSettings('similarity', 5, 80, 5, 25, 5, 25, 'voyage-multilingual-2', 'gpt-3.5-turbo');
         clearChatHistory(onLoad = true);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
@@ -50,15 +51,20 @@ document.addEventListener("DOMContentLoaded", function() {
         ragOptions();
         updateSettings();
         contextCollapseEvents(1);
-        hideOverlay();
+        initTooltips();
         databaseDropdown.classList.add('show');
         settingsDropdown.classList.add('show');
         historyDropdown.classList.add('show');
-        document.querySelectorAll('[data-toggle="tooltip"]').forEach(element => {
-            new bootstrap.Tooltip(element, { boundary: 'window' });
-        });
         leftSidebarEvents();
         fetchDocuments();
+        hideOverlay();
+    }
+
+    function initTooltips() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });        
     }
 
     function collapseSidebarsOnLoad() {
@@ -75,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function() {
         leftBtn.addEventListener('click', () => toggleSidebar('left'));
         rightBtn.addEventListener('click', () => toggleSidebar('right'));
         blackBackground.addEventListener('click', () => toggleSidebar('left'));
-        clearHistoryBtn.addEventListener('click', () => clearChatHistory());
+        clearHistoryBtn.addEventListener('click', () => clearChatHistory(onLoad = false));
 
         document.addEventListener("visibilitychange", handleVisibilityChange);
         win.addEventListener('resize', () => {
@@ -109,12 +115,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function initSettings(initSimilarityVal, initSimilarityScoreVal, initConsideredVal, initRetrievedVal, initLambdaVal) {
+    function initSettings(initSearchType, initSimilarityVal, initSimilarityScoreVal, initMaxChunkValue, initConsideredVal, initRetrievedVal, initLambdaVal, initEmbedding, initLLM) {
+        searchTypeDropdown.value = initSearchType;
+        
         similaritySliderValue.textContent = initSimilarityVal;
         similaritySlider.value = initSimilarityVal;
 
         similarityScoreSliderValue.textContent = initSimilarityScoreVal;
         similarityScoreSlider.value = initSimilarityScoreVal;
+
+        maxChunkSliderValue.textContent = initMaxChunkValue;
+        maxChunkSlider.value = initMaxChunkValue;
 
         consideredChunkSliderValue.textContent = initConsideredVal;
         consideredChunkSlider.value = initConsideredVal;
@@ -124,6 +135,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         lambdaSliderValue.textContent = initLambdaVal;
         lambdaSlider.value = initLambdaVal;
+
+        embeddingModelDropdown.value = initEmbedding;
+
+        llmModelDropdown.value = initLLM;
     }
 
     function leftSidebarEvents() {
@@ -187,6 +202,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         similarityScoreSliderValue.textContent = similarityScoreSlider.value;
 
+        maxChunkSlider.addEventListener('input', function() {
+            maxChunkSliderValue.textContent = maxChunkSlider.value;
+            sendOptions();
+        });
+        maxChunkSliderValue.textContent = maxChunkSlider.value;
+
         consideredChunkSlider.addEventListener('input', function() {
             consideredChunkSliderValue.textContent = this.value;
             sendOptions();
@@ -229,6 +250,7 @@ document.addEventListener("DOMContentLoaded", function() {
             search_type: searchTypeDropdown.value,
             similarity_doc_nb: parseInt(similaritySlider.value, 10),
             score_threshold: parseInt(similarityScoreSlider.value, 10) / 100,
+            max_chunk_return: parseInt(maxChunkSlider.value, 10),
             considered_chunk: parseInt(consideredChunkSlider.value, 10),
             mmr_doc_nb: parseInt(retrievedChunkSlider.value, 10),
             lambda_mult: parseInt(lambdaSlider.value, 10) / 100,

@@ -18,6 +18,7 @@ def get_rag_chain(params = None):
         "search_type": "similarity",
         "similarity_doc_nb": 5,
         "score_threshold": 0.8,
+        "max_chunk_return": 5,
         "considered_chunk": 25,
         "mmr_doc_nb": 5,
         "lambda_mult":0.25,
@@ -42,7 +43,7 @@ def get_rag_chain(params = None):
         if search_type == "similarity":
             retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["similarity_doc_nb"]})
         elif search_type == "similarity_score_threshold":
-            retriever = db.as_retriever(search_type=search_type, search_kwargs={"score_threshold": params["score_threshold"]})
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["max_chunk_return"],"score_threshold": params["score_threshold"]})
         elif search_type == "mmr":
             retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["mmr_doc_nb"], "fetch_k": params["considered_chunk"], "lambda_mult": params["lambda_mult"]})
         else:
@@ -70,9 +71,6 @@ def get_rag_chain(params = None):
             llm, retriever, contextualize_q_prompt
         )
         retriever = history_aware_retriever
-        print("history on")
-    else:
-        print("history off")
 
     qa_system_prompt = """You are an assistant for question-answering tasks. \
     Use the following pieces of retrieved context to answer the question. \
