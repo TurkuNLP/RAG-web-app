@@ -39,6 +39,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let rightWasOpen = true;
     let leftWasOpen = true;
     let resizeTimeout;
+    let searchNumber = 0;
+    let storedChunks = 0;
 
     // Initialization
     function init() {
@@ -509,6 +511,24 @@ document.addEventListener("DOMContentLoaded", function() {
         container.appendChild(collapseDiv);
     }
 
+    function createSearchNumberElement() {
+        const contextRetriever = document.querySelector('.context-retriever');
+        if (searchNumber === 0) {
+            contextRetriever.innerHTML = '';
+        }
+        const cardHeader = document.createElement('div');
+        cardHeader.className = 'card-header search-card';
+
+        searchNumber += 1;
+
+        const span = document.createElement('span');
+        span.className = 'float-start mx-2 text-white';
+        span.textContent = `Search ${searchNumber}`;
+
+        cardHeader.appendChild(span);
+        contextRetriever.appendChild(cardHeader);
+    }
+
     function submitQuery() {
         const userMessage = chatInput.value.trim();
         chatBox.appendChild(createChatLi(userMessage, "outcoming"));
@@ -523,15 +543,16 @@ document.addEventListener("DOMContentLoaded", function() {
             chatBox.appendChild(createChatLi(data.response, "incoming"));
             chatBox.scrollTo(0, chatBox.scrollHeight);
 
-            const contextRetriever = document.querySelector('.context-retriever');
-            contextRetriever.innerHTML = '';
+            createSearchNumberElement();
 
             for (let i = 0; i < data.context.length; i++) {
-                createContextElement(data.context[i].replace(/\n/g, "<br>"), data.source[i], i + 1);
+                createContextElement(data.context[i].replace(/\n/g, "<br>"), data.source[i], storedChunks + i + 1);
             }
             
+            storedChunks += data.context.length;
+
             waitForElements(data.context.length, () => {
-                contextCollapseEvents(data.context.length);
+                contextCollapseEvents(storedChunks);
             });
         });
         chatInput.value = "";
@@ -550,7 +571,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if(!onLoad) {
                 const contextRetriever = document.querySelector('.context-retriever');
                 contextRetriever.innerHTML = '';
-                chatBox.innerHTML = '';                
+                chatBox.innerHTML = '';
+                searchNumber = 0;
+                storedChunks = 0;        
             }
         })
         .catch((error) => {
