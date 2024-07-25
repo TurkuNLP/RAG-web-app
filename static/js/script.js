@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const initialWidth = window.innerWidth;
     const databaseDropdown = document.getElementById("collapseDatabase");
     const settingsDropdown = document.getElementById("collapseSettings");
-    const historyDropdown = this.getElementById("collapseHistory");
+    const historyDropdown = document.getElementById("collapseHistory");
     const chatBox = document.querySelector('.chatbox');
     const chatInput = document.getElementById("chatInput");
     
@@ -18,11 +18,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const similaritySlider = document.getElementById('similaritySlider');
     const similaritySliderValue = document.getElementById('similaritySliderValue');
+    const maxChunkSlider = document.getElementById('maxChunkSlider');
+    const maxChunkSliderValue = document.getElementById('maxChunkSliderValue');
 
     const similarityScoreSlider = document.getElementById('similarityScoreSlider');
     const similarityScoreSliderValue = document.getElementById('similarityScoreSliderValue');
-    const maxChunkSlider = document.getElementById('maxChunkSlider');
-    const maxChunkSliderValue = document.getElementById('maxChunkSliderValue');
     
     const consideredChunkSlider = document.getElementById('consideredChunkSlider');
     const consideredChunkSliderValue = document.getElementById('consideredChunkSliderValue');
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
         leftBtn.addEventListener('click', () => toggleSidebar('left'));
         rightBtn.addEventListener('click', () => toggleSidebar('right'));
         blackBackground.addEventListener('click', () => toggleSidebar('left'));
-        clearHistoryBtn.addEventListener('click', () => clearChatHistory(onLoad = false));
+        clearHistoryBtn.addEventListener('click', () => clearChatHistory());
 
         document.addEventListener("visibilitychange", handleVisibilityChange);
         win.addEventListener('resize', () => {
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
             lambda_mult: parseInt(lambdaSlider.value, 10) / 100,
             isHistoryOn : historySwitchBtn.checked
         };
-        fetch("/update-settings", {
+        fetch(`${root}/update-settings`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -472,7 +472,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const downloadIcon = document.createElement('img');
             downloadIcon.classList.add('icon');
             downloadIcon.classList.add('download-icon');
-            downloadIcon.src = 'static/img/download.svg';
+            downloadIcon.src = `${root}/static/img/download.svg`;
 
             downloadButton.appendChild(downloadIcon);
             cardHeader.appendChild(downloadButton);
@@ -532,7 +532,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function submitQuery() {
         const userMessage = chatInput.value.trim();
         chatBox.appendChild(createChatLi(userMessage, "outcoming"));
-        fetch("/get", {
+        fetch(`${root}/get`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -560,7 +560,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function clearChatHistory(onLoad = false) {
-        fetch('/clear_chat_history', {
+        fetch(`${root}/clear_chat_history`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -568,12 +568,12 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (!onLoad) {
-            const contextRetriever = document.querySelector('.context-retriever');
-            contextRetriever.innerHTML = '';
-            chatBox.innerHTML = '';
-            searchNumber = 0;
-            storedChunks = 0;
+            if(!onLoad) {
+                const contextRetriever = document.querySelector('.context-retriever');
+                contextRetriever.innerHTML = '';
+                chatBox.innerHTML = '';
+                searchNumber = 0;
+                storedChunks = 0;        
             }
         })
         .catch((error) => {
@@ -605,20 +605,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
         switch (doc.extension.toLowerCase()) {
             case 'pdf':
-                icon.src = 'static/img/pdf.svg';
+                icon.src = `${root}/static/img/pdf.svg`;
                 break;
             case 'docs':
-                icon.src = 'static/img/doc.svg';
+                icon.src = `${root}/static/img/doc.svg`;
                 break;
             case 'txt':
-                icon.src = 'static/img/txt.svg';
+                icon.src = `${root}/static/img/txt.svg`;
                 break;
             case 'csv':
-                icon.src = 'static/img/csv.svg';
+                icon.src = `${root}/static/img/csv.svg`;
                 break;
 
             default:
-                icon.src = 'static/img/doc.svg';
+                icon.src = `${root}/static/img/doc.svg`;
         }
         return icon;
     }
@@ -634,7 +634,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     async function fetchDocuments() {
-        const response = await fetch('/documents');
+        const response = await fetch(`${root}/documents`);
         const documents = await response.json();
         const listElement = document.querySelector('.database');
 
@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     async function fetchDocument(documentName) {
         try {
-            const response = await fetch(`/documents/${documentName}`);
+            const response = await fetch(`${root}/documents/${documentName}`);
             if (!response.ok) {
                 throw new Error('Document not found');
             }

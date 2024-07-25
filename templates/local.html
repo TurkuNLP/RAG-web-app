@@ -243,9 +243,11 @@
             <!-- Add footer content if necessary -->
         </div>
     </ul>
-
+    <script>
+        var root = "{{ root }}";
+    </script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
 </html>

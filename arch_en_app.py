@@ -18,7 +18,8 @@ from ConversationalRagChain import ConversationalRagChain
 
 @arch_en.route("/")
 def index():
-    return render_template('arch_en_index.html')
+    root = "/arch-en"
+    return render_template('arch_en_index.html', root=root)
 
 arch_en.register_blueprint(main, url_prefix='/arch-en')
 

@@ -240,9 +240,11 @@
             <!-- Add footer content if necessary -->
         </div>
     </ul>
-
+    <script>
+        var root = "{{ root }}";
+    </script>
     <script src="arch-en/{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="arch-en/{{ url_for('static', filename='js/arch_en_script.js') }}"></script>
+    <script src="arch-en/{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
 </html>
