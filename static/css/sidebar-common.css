@@ -44,6 +44,10 @@
   padding: 0 0.5rem;
 }
 
+.sidebar-right .nav-body {
+  margin-bottom: 0.5rem;
+}
+
 .sidebar-left .nav-footer,
 .sidebar-right .nav-footer {
   display: contents !important;
@@ -110,18 +114,18 @@
   background-color: #6177d9;
 }
 
-.sidebar-left .nav-item,
-.sidebar-right .nav-item {
-  margin-bottom: 0.3rem;
-}
-
 .sidebar-left .nav-link,
 .sidebar-right .nav-link {
   position: relative;
   padding-top: 0.7rem !important;
   padding-bottom: 0.7rem !important;
-  font-size: 1rem;
-  opacity: 0.9;
+  margin: 0.5rem;
+  margin-top: 0;
+}
+
+.left-sidebar-closed .sidebar-left .nav-link,
+.right-sidebar-closed .sidebar-right .nav-link {
+  display: none;
 }
 
 .sidebar-left .fas.fa-caret-down.float-none.float-lg-right.fa-sm,

@@ -66,8 +66,8 @@
 }
 .sidebar-right .nav-body .card-body {
   background-color: #5b72d6;
-  padding: 0.5rem 0.5rem;
   position: relative;
+  padding: 1rem 2rem;
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
 }
@@ -98,10 +98,6 @@
 .sidebar-right .context-retriever .card-header:hover {
   background-color: #5b72d6;
   border-radius: 1rem;
-}
-.sidebar-right .context-retriever .card-body {
-  border-top: 2rem;
-  padding: 1rem 2rem;
 }
 .sidebar-right .context-retriever .btn {
   width: 100%;

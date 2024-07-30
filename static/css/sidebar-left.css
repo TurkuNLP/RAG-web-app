@@ -136,6 +136,7 @@
 }
 .sidebar-left .nav-body .card-body.database {
   padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 .sidebar-left .nav-body .card-body .database-item {
   white-space: nowrap;

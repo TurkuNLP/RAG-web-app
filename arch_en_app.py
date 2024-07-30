@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Flask, Blueprint, render_template, request, jsonify, send_from_directory
+from flask import Flask, Blueprint, render_template, request, jsonify, send_from_directory, url_for
 
 arch_en = Flask(__name__)
 main = Blueprint('main', __name__, static_folder='static', static_url_path='/arch-en/static', template_folder='templates')
@@ -18,10 +18,9 @@ from ConversationalRagChain import ConversationalRagChain
 
 @arch_en.route("/")
 def index():
-    root = "/arch-en"
+    root = "arch-en"
     return render_template('arch_en_index.html', root=root)
 
-arch_en.register_blueprint(main, url_prefix='/arch-en')
 
 def init_app():
     load_rag()
