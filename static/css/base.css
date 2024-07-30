@@ -1,0 +1,130 @@
+:root{
+  /*===== Colors =====*/
+  --white: #FFF;
+  --white-svg: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(0%) hue-rotate(161deg) brightness(101%) contrast(104%);
+  --black-svg: brightness(0) saturate(100%);
+  --primary-color: #455dc7;
+  --primary-color-svg: brightness(0) saturate(100%) invert(39%) sepia(15%) saturate(6445%) hue-rotate(213deg) brightness(81%) contrast(91%);
+  --primary-color-light: #5b72d6;
+  --primary-color-light-svg : brightness(0) saturate(100%) invert(49%) sepia(28%) saturate(5650%) hue-rotate(211deg) brightness(89%) contrast(86%);
+  --background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Base Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-size: 13px;
+  overflow: hidden;
+  transition: padding-left 0.3s ease, padding-right 0.3s ease;
+}
+
+/* Overlay Styles */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--white);
+  z-index: 9999;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.black-background {
+  background-color: var(--background-color);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 999;
+}
+
+.black-background.hidden {
+  display: none !important;
+}
+
+/* Small screen conditions */
+.small .sidebar-left {
+  width: 20rem;
+}
+
+.small .sidebar-right {
+  width: 100vw !important;
+}
+
+.small {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/* Medium screen conditions */
+.medium .sidebar-left {
+  width: 20rem;
+}
+
+.medium .sidebar-right {
+  width: 50vw !important;
+}
+
+.medium {
+  padding-left: 20rem;
+  padding-right: 50vw;
+}
+
+.medium.left-sidebar-closed {
+  padding-left: 0;
+}
+
+.medium.right-sidebar-closed {
+  padding-right: 0;
+}
+
+/* Large screen conditions */
+.large .sidebar-left {
+  width: 20rem;
+}
+
+.large .sidebar-right {
+  width: 35vw !important;
+}
+
+.large {
+  padding-left: 20rem;
+  padding-right: 35vw;
+}
+
+.large.left-sidebar-closed {
+  padding-left: 0;
+}
+
+.large.right-sidebar-closed {
+  padding-right: 0;
+}
+.info-icon {
+  width: 15px;
+  height: 15px;
+  margin: 0rem;
+  margin-right: 0.5rem;
+  filter: var(--white-svg);
+  opacity: 0.5;
+}
+.tooltip-inner {
+  text-align: left;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  max-width: 400px;
+}
+.tooltip {
+  pointer-events: none;
+}
+.btn-menu {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+}

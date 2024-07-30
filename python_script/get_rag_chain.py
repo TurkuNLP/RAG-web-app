@@ -1,45 +1,76 @@
-from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE
+from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL
 
 from get_embedding_function import get_embedding_function
 from get_llm_function import get_llm_function
 from populate_database import find_chroma_path
 
-from langchain_core.messages import HumanMessage
 from langchain.vectorstores.chroma import Chroma
 from langchain.chains import create_history_aware_retriever
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-def get_rag_chain():
+def get_rag_chain(params = None):
+    default_params = {
+        "chroma_root_path": CHROMA_ROOT_PATH,
+        "embedding_model": EMBEDDING_MODEL,
+        "llm_model": LLM_MODEL,
+        "search_type": "similarity",
+        "similarity_doc_nb": 5,
+        "score_threshold": 0.8,
+        "max_chunk_return": 5,
+        "considered_chunk": 25,
+        "mmr_doc_nb": 5,
+        "lambda_mult":0.25,
+        "isHistoryOn": True,
+    }
+    if params is None :
+        params = default_params
+    else:
+        params = {**default_params, **params}
+
     try:
-        embedding_model = get_embedding_function(EMBEDDING_MODEL)
-        llm = get_llm_function(LLM_MODEL)
-        db = Chroma(persist_directory=find_chroma_path(EMBEDDING_MODEL,CHROMA_ROOT_PATH), embedding_function=embedding_model)
+        required_keys = ["chroma_root_path", "embedding_model", "llm_model"]
+        for key in required_keys:
+            if key not in params:
+                raise NameError(f"Required setting '{key}' not defined.")
+        
+        embedding_model = get_embedding_function(model_name=params["embedding_model"])
+        llm = get_llm_function(model_name=params["llm_model"])
+        db = Chroma(persist_directory=find_chroma_path(model_name=params["embedding_model"], base_path=params["chroma_root_path"]), embedding_function=embedding_model)
+        
+        search_type = params["search_type"]
+        if search_type == "similarity":
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["similarity_doc_nb"]})
+        elif search_type == "similarity_score_threshold":
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["max_chunk_return"],"score_threshold": params["score_threshold"]})
+        elif search_type == "mmr":
+            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["mmr_doc_nb"], "fetch_k": params["considered_chunk"], "lambda_mult": params["lambda_mult"]})
+        else:
+            raise ValueError("Invalid 'search_type' setting")
+        
     except NameError as e:
         variable_name = str(e).split("'")[1]
-        raise NameError (f"The global variable '{variable_name}' is not defined. Please ensure that all required global variables (EMBEDDING_MODEL, LLM_MODEL, CHROMA_ROOT_PATH) are imported or defined.") from e
-    
-    retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+        raise NameError(f"{variable_name} isn't defined")
+         
+    if params["isHistoryOn"]:
+        contextualize_q_system_prompt = """Given a chat history and the latest user question \
+        which might reference context in the chat history, formulate a standalone question \
+        which can be understood without the chat history. Do NOT answer the question, \
+        just reformulate it if needed and otherwise return it as is."""
 
+        contextualize_q_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", contextualize_q_system_prompt),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
 
-    contextualize_q_system_prompt = """Given a chat history and the latest user question \
-    which might reference context in the chat history, formulate a standalone question \
-    which can be understood without the chat history. Do NOT answer the question, \
-    just reformulate it if needed and otherwise return it as is."""
-
-    contextualize_q_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ]
-    )
-
-    history_aware_retriever = create_history_aware_retriever(
-        llm, retriever, contextualize_q_prompt
-    )
+        history_aware_retriever = create_history_aware_retriever(
+            llm, retriever, contextualize_q_prompt
+        )
+        retriever = history_aware_retriever
 
     qa_system_prompt = """You are an assistant for question-answering tasks. \
     Use the following pieces of retrieved context to answer the question. \
@@ -57,6 +88,6 @@ def get_rag_chain():
 
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
 
-    rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
     return rag_chain

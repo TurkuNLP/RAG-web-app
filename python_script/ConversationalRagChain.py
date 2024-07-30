@@ -91,13 +91,21 @@ class ConversationalRagChain(Chain):
         sources = []
         for doc in documents:
             contexts.append(doc.page_content)
-            sources.append(doc.metadata['id'])
+            # TODO Update database which has the last metadata storage system
+            try:
+                sources.append(doc.metadata['file_name'])
+            except:
+                sources.append(doc.metadata['source'])
         return answer,contexts,sources
 
     def update_chat_history(self, user_question, bot_response):
         """Update the chat history"""
         self.chat_history.append({"role": "user", "content": user_question})
         self.chat_history.append({"role": "ai", "content": bot_response})
+
+    def clear_chat_history(self):
+        """Clear chat history"""
+        self.chat_history = []
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         """Call the chain. Return a dict with answer, context and source"""
@@ -106,7 +114,9 @@ class ConversationalRagChain(Chain):
 
         output = self.rag_chain.invoke({"input": question, "chat_history": chat_history})
         answer,contexts,sources = self.format_outputs(output)
-        #chat_history.extend([HumanMessage(content=question), answer])
 
+        if not contexts:
+            answer = "No context found, try rephrasing your question"
+            
         self.update_chat_history(question, answer) 
         return {self.output_key: answer, self.context_key: contexts, self.source_key: sources}
