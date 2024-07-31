@@ -29,7 +29,7 @@ def extract_text_from_pdf(pdf_path):
         
             # Use pytesseract to do OCR on the image
             page_text = pytesseract.image_to_string(img, lang='rus+eng+deu')
-            
+
         print(pdf_path.split('/')[-1], page_num)
         lines = page_text.split('\n')
         
@@ -39,7 +39,8 @@ def extract_text_from_pdf(pdf_path):
             if stripped_line:
                 if paragraph:
                     if paragraph.endswith('-'):
-                        paragraph = paragraph[:-1] + stripped_line  # Reconstituer le mot coupé
+                        # Reconstruct the cut word
+                        paragraph = paragraph[:-1] + stripped_line  
                     else:
                         paragraph += " " + stripped_line
                 else:
@@ -52,13 +53,13 @@ def extract_text_from_pdf(pdf_path):
         if paragraph:
             text += paragraph + "\n\n"
         
-        # Ajouter le numéro de page à la fin de chaque page
+        # Add page number at the end of each page
         text += f"Page {page_num + 1}\n\n"
 
     return text.strip()
 
 def clean_text(text):
-    # Suppression des caractères non imprimables et des caractères de contrôle, en conservant les caractères russes
+    # Removed non-printable characters and control characters, keeping Russian characters
     return re.sub(r'[^\x20-\x7Eа-яА-ЯёЁ]', '', text)
 
 def save_text_to_docx(texts, docx_path_base, max_chars=980000):
@@ -87,11 +88,12 @@ def save_text_to_docx(texts, docx_path_base, max_chars=980000):
         char_count += len(document_title) + 2
         
         pages = text.split('Page ')
-        for page in pages[1:]:  # Ignorer le premier élément car il est avant la première page
+        # Ignore the first element because it is before the first page
+        for page in pages[1:]:  
             page_content = page.split('\n\n', 1)
             page_num = page_content[0].strip()
             
-            # Ajouter le numéro de page souligné
+            # Add underlined page number
             page_paragraph = doc.add_paragraph()
             page_run = page_paragraph.add_run(f"Page {page_num}")
             page_run.underline = True
@@ -102,10 +104,12 @@ def save_text_to_docx(texts, docx_path_base, max_chars=980000):
                 
                 for para in paragraphs:
                     clean_para = clean_text(para)
-                    if clean_para:  # Ajouter seulement si le paragraphe n'est pas vide
+                    # Add only if paragraph is not empty
+                    if clean_para:  
                         paragraph = doc.add_paragraph(clean_para)
                         char_count += len(clean_para) + 2
-                    doc.add_paragraph('')  # Ajouter une ligne vide entre les paragraphes
+                    # Add a blank line between paragraphs
+                    doc.add_paragraph('')  
                     char_count += 2
                     
                     if char_count >= max_chars:
@@ -170,12 +174,12 @@ def merge_docx_files(input_dir, output_path, max_chars=1000000):
         current_composer.save(f"{output_path}_{doc_num:02d}.docx")
 
 # Specify the input and output directory paths
-input_dir = "/home/mtebad/projects/RAG-web-app/data/russian_data"
-output_dir = "/home/mtebad/projects/RAG-web-app/data/output"
+input_dir = "/home/mtebad/projects/RAG-web-app/data/"
+output_dir = "/home/mtebad/projects/RAG-web-app/data/"
 
 # changes pdfs to docx
 process_directory(input_dir, output_dir)
 # merges docx files
-merge_docx_files(output_dir, os.path.join('/home/mtebad/projects/RAG-web-app/data/output', "merged_document"))
+#merge_docx_files(output_dir, os.path.join('/home/mtebad/projects/RAG-web-app/data/output', "merged_document"))
 
 print("Traitement terminé avec succès.")
