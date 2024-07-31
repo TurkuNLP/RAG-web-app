@@ -70,6 +70,7 @@
   padding: 1rem 2rem;
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
+  overflow-wrap: anywhere;
 }
 
 /* Context Retriever Styles */
@@ -119,4 +120,10 @@
 }
 .sidebar-right .context-retriever .context .fa {
   padding-right: 0.3rem;
+}
+
+.sidebar-right .context-retriever .card-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 0.5rem;
 }

@@ -262,6 +262,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     /** 
      * Manages the visibility of different context panels
+     * @param {number} numberOfDocuments - The number of documents 
      */
     function setupContextCollapseEvents(numberOfDocuments) {
         for (let i = 1; i <= numberOfDocuments; i++) {
@@ -270,6 +271,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const collapseElement = document.getElementById(collapseId);
             const headingElement = document.getElementById(headingId);
             if (collapseElement && headingElement) {
+                console.log(i);
                 collapseElement.addEventListener('show.bs.collapse', () => {
                     headingElement.classList.add('collapse-open');
                 });
@@ -278,8 +280,28 @@ document.addEventListener("DOMContentLoaded", function() {
                         headingElement.classList.remove('collapse-open');
                     }, 300);
                 });
-            } else {
-                console.warn(`Elements with IDs ${collapseId} or ${headingId} do not exist.`);
+            }
+        }
+    }
+
+    /** 
+     * Binds the close event on click for all close buttons
+     * @param {number} numberOfDocuments - The number of documents/close button
+     */
+    function setupCloseEventListener(numberOfDocuments) {
+        for (let i = 1; i <= numberOfDocuments; i++) {
+            const closeButton = document.getElementById(`close${i}`);
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    const collapseElement = document.getElementById(`collapse${i}`);
+                    const headingElement = document.getElementById(`heading${i}`);
+                    if (collapseElement) {
+                        collapseElement.parentNode.removeChild(collapseElement);
+                    }
+                    if (headingElement) {
+                        headingElement.parentNode.removeChild(headingElement);
+                    }
+                })
             }
         }
     }
@@ -302,15 +324,16 @@ document.addEventListener("DOMContentLoaded", function() {
             chatBox.scrollTo(0, chatBox.scrollHeight);
 
             addSearchNumberElement();
+            newDocs = data.context.length;
 
-            for (let i = 0; i < data.context.length; i++) {
+            for (let i = 0; i < newDocs; i++) {
                 addContextElement(data.context[i].replace(/\n/g, "<br>"), data.source[i], storedChunks + i + 1);
             }
 
-            storedChunks += data.context.length;
-
-            waitForContextElementsToLoad(data.context.length, () => {
+            waitForNewContextElementsToLoad(newDocs, storedChunks, () => {
+                storedChunks += newDocs
                 setupContextCollapseEvents(storedChunks);
+                setupCloseEventListener(storedChunks);
             });
         });
         chatInput.value = "";
@@ -440,6 +463,22 @@ document.addEventListener("DOMContentLoaded", function() {
         const span = document.createElement('span');
         span.className = 'float-start mx-2';
 
+        const cardFooter = document.createElement('div');
+        cardFooter.className = 'card-footer text-white';
+
+        const viewIcon = document.createElement('img');
+        viewIcon.classList.add('icon');
+        viewIcon.classList.add('download-icon');
+        viewIcon.src = `${root}/static/img/view.svg`;
+
+        const closeButton = document.createElement('btn');
+        const closeIcon = document.createElement('img');
+        closeIcon.classList.add('icon');
+        closeIcon.classList.add('download-icon');
+        closeIcon.src = `${root}/static/img/cancel.svg`;
+        closeButton.id = `close${contextNumber}`;
+        closeButton.appendChild(closeIcon);
+
         const doc = await getDocument(source);
         if (doc) {
             const docIcon = createIcon(doc);
@@ -453,9 +492,13 @@ document.addEventListener("DOMContentLoaded", function() {
             downloadIcon.classList.add('icon');
             downloadIcon.classList.add('download-icon');
             downloadIcon.src = `${root}/static/img/download.svg`;
-
+    
             downloadButton.appendChild(downloadIcon);
             cardHeader.appendChild(downloadButton);
+
+            cardFooter.appendChild(downloadButton);
+            cardFooter.appendChild(viewIcon);
+            cardFooter.appendChild(closeButton);
         } else {
             console.error('Document is undefined');
         }
@@ -483,6 +526,9 @@ document.addEventListener("DOMContentLoaded", function() {
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body text-white text-justify';
         cardBody.innerHTML = context;
+
+
+        cardBody.appendChild(cardFooter);
 
         collapseDiv.appendChild(cardBody);
 
@@ -543,10 +589,11 @@ document.addEventListener("DOMContentLoaded", function() {
      * @param {number} numberOfDocuments - The number of context documents to wait for.
      * @param {Function} callback - The callback function to execute after elements are loaded.
      */
-    function waitForContextElementsToLoad(numberOfDocuments, callback) {
+    function waitForNewContextElementsToLoad(newDocs, numberOfDocumentsBefore, callback) {
         const interval = setInterval(() => {
             let allExist = true;
-            for (let i = 1; i <= numberOfDocuments; i++) {
+            for (let i = numberOfDocumentsBefore+1; i <= numberOfDocumentsBefore+newDocs; i++) {
+                console.log(i);
                 const collapseId = `#collapse${i}`;
                 const headingId = `#heading${i}`;
                 if (!document.querySelector(collapseId) || !document.querySelector(headingId)) {
