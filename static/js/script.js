@@ -271,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const collapseElement = document.getElementById(collapseId);
             const headingElement = document.getElementById(headingId);
             if (collapseElement && headingElement) {
-                console.log(i);
                 collapseElement.addEventListener('show.bs.collapse', () => {
                     headingElement.classList.add('collapse-open');
                 });
@@ -301,8 +300,63 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (headingElement) {
                         headingElement.parentNode.removeChild(headingElement);
                     }
-                })
+                });
             }
+        }
+    }
+
+    /** 
+     * Binds the close event on click for all close buttons
+     * @param {number} numberOfDocuments - The number of documents = number of close buttons
+     */
+    function setupViewEventListener(numberOfDocuments) {
+        for (let docNumber = 1; docNumber <= numberOfDocuments; docNumber++) {
+            const viewButton = document.getElementById(`view${docNumber}`);
+            if (viewButton) {
+                displayPDF(viewButton.getAttribute('data-document-name'), viewButton.getAttribute('data-page-number'), docNumber);
+                const viewContainer = document.getElementById(`pdf-${docNumber}`);
+                viewButton.addEventListener('click', () => {
+                    viewContainer.classList.toggle('hide');
+                });
+            }
+        }
+    }
+
+    /** 
+     * Assigns the pdf to the right button to allow user to display it
+     * @param {string} documentName - Name of the document
+     * @param {number} pageNumber - Page number where the chunk is located
+     * @param {number} viewNumber - Number of the element on the webpage
+     */
+    async function displayPDF(documentName, pageNumber, viewNumber) {
+        const documentData = await getDocument(documentName);
+        if (documentData && documentData.url) {
+            var url = documentData.url;
+            console.log(url);
+            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+            var loadingTask = pdfjsLib.getDocument(url);
+            loadingTask.promise.then(function(pdf) {
+                // TODO fix the page system, the one Antonin converted are wrong and need pageNumber+1
+                pdf.getPage(parseInt(pageNumber, 10)+1).then(function(page) {
+                    var scale = 1;
+                    var viewport = page.getViewport({ scale: scale });
+
+                    var canvas = document.getElementById(`pdf-canvas-${viewNumber}`);
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }, function(reason) {
+                console.error(reason);
+            });
         }
     }
 
@@ -326,14 +380,17 @@ document.addEventListener("DOMContentLoaded", function() {
             addSearchNumberElement();
             newDocs = data.context.length;
 
+
             for (let i = 0; i < newDocs; i++) {
-                addContextElement(data.context[i].replace(/\n/g, "<br>"), data.source[i], storedChunks + i + 1);
+                console.log(data.metadatas[i]);
+                addContextElement(data.context[i].replace(/\n/g, "<br>"), data.metadatas[i], storedChunks + i + 1);
             }
 
             waitForNewContextElementsToLoad(newDocs, storedChunks, () => {
                 storedChunks += newDocs
                 setupContextCollapseEvents(storedChunks);
                 setupCloseEventListener(storedChunks);
+                setupViewEventListener(storedChunks);
             });
         });
         chatInput.value = "";
@@ -452,10 +509,13 @@ document.addEventListener("DOMContentLoaded", function() {
     /**
      * Creates and displays a new context element in the right sidebar.
      * @param {string} context - The context content.
-     * @param {string} source - The source of the context.
+     * @param {string} metadatas - The metadatas of the chunk.
      * @param {number} contextNumber - The numerical identifier for the context.
      */
-    async function addContextElement(context, source, contextNumber) {
+    async function addContextElement(context, metadatas, contextNumber) {
+        let fileName = metadatas["file_name"];
+        console.log(fileName);
+
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';
         cardHeader.id = `heading${contextNumber}`;
@@ -466,11 +526,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const cardFooter = document.createElement('div');
         cardFooter.className = 'card-footer text-white';
 
-        const viewIcon = document.createElement('img');
-        viewIcon.classList.add('icon');
-        viewIcon.classList.add('download-icon');
-        viewIcon.src = `${root}/static/img/view.svg`;
-
         const closeButton = document.createElement('btn');
         const closeIcon = document.createElement('img');
         closeIcon.classList.add('icon');
@@ -479,11 +534,19 @@ document.addEventListener("DOMContentLoaded", function() {
         closeButton.id = `close${contextNumber}`;
         closeButton.appendChild(closeIcon);
 
-        const doc = await getDocument(source);
+        const pdfdiv = document.createElement('div');
+        pdfdiv.className = 'pdf-viewer hide';
+        pdfdiv.id = `pdf-${contextNumber}`;
+        const canva = document.createElement('canvas');
+        canva.id = `pdf-canvas-${contextNumber}`;
+
+        const doc = await getDocument(fileName);
+        console.log(fileName);
         if (doc) {
+            console.log(doc.name);
             const docIcon = createIcon(doc);
             span.appendChild(docIcon);
-            span.appendChild(document.createTextNode(source));
+            span.appendChild(document.createTextNode(fileName));
 
             const downloadButton = createLink(doc);
             downloadButton.textContent = "";
@@ -497,8 +560,21 @@ document.addEventListener("DOMContentLoaded", function() {
             cardHeader.appendChild(downloadButton);
 
             cardFooter.appendChild(downloadButton);
-            cardFooter.appendChild(viewIcon);
+            if(doc.extension.toLowerCase() === 'pdf'){
+                const viewButton = document.createElement('btn');
+                const viewIcon = document.createElement('img');
+                viewIcon.classList.add('icon');
+                viewIcon.classList.add('download-icon');
+                viewIcon.src = `${root}/static/img/view.svg`;
+                viewButton.id = `view${contextNumber}`;
+                viewButton.setAttribute('data-document-name', fileName);
+                viewButton.setAttribute('data-page-number', metadatas["page"]);
+
+                viewButton.appendChild(viewIcon);
+                cardFooter.appendChild(viewButton);
+            }           
             cardFooter.appendChild(closeButton);
+
         } else {
             console.error('Document is undefined');
         }
@@ -527,8 +603,10 @@ document.addEventListener("DOMContentLoaded", function() {
         cardBody.className = 'card-body text-white text-justify';
         cardBody.innerHTML = context;
 
-
         cardBody.appendChild(cardFooter);
+
+        pdfdiv.appendChild(canva);
+        cardBody.appendChild(pdfdiv);
 
         collapseDiv.appendChild(cardBody);
 
@@ -593,7 +671,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const interval = setInterval(() => {
             let allExist = true;
             for (let i = numberOfDocumentsBefore+1; i <= numberOfDocumentsBefore+newDocs; i++) {
-                console.log(i);
                 const collapseId = `#collapse${i}`;
                 const headingId = `#heading${i}`;
                 if (!document.querySelector(collapseId) || !document.querySelector(headingId)) {

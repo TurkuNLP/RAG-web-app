@@ -127,3 +127,18 @@
   justify-content: space-between;
   padding-top: 0.5rem;
 }
+
+.pdf-viewer {
+  max-height: 400px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  margin-top: 0.5rem;
+}
+.pdf-viewer.hide{
+  display: none;
+}
+canvas {
+  display: block;
+  margin: auto;
+}

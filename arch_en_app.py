@@ -85,12 +85,10 @@ def get_Chat_response(query):
     }
     res = rag_conv._call(inputs)
 
-    print(res)
-
     output = jsonify({
         'response': res['result'],
         'context': res['context'],
-        'source': res['source']
+        'metadatas': res['metadatas']
     })
     return output
 
