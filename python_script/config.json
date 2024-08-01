@@ -1,7 +1,7 @@
 {
     "default": {
-        "data_path": "data/documents",
-        "chroma_root_path": "data/chroma",
+        "data_path": "data/documents/default",
+        "chroma_root_path": "data/chroma/default",
         "embedding_model": "voyage-law-2",
         "llm_model": "gpt-3.5-turbo",
         "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nAnswer the question based on the above context: {question}"
@@ -9,28 +9,28 @@
     "seus": {
       "data_path": "data/documents/ship_data",
       "chroma_root_path": "data/chroma/ship_chroma",
-      "embedding_model": "voyage-law-2",
+      "embedding_model": "voyage-multilingual-2",
       "llm_model": "gpt-3.5-turbo",
       "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nAnswer the question based on the above context: {question}"
     },
     "arch_en": {
-      "data_path": "data/documents/arch_data-ru",
-      "chroma_root_path": "data/chroma/arch_data-ru_chroma",
-      "embedding_model": "voyage-law-2",
+      "data_path": "data/documents/arch_data-en",
+      "chroma_root_path": "data/chroma/arch_data-en_chroma",
+      "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo",
       "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nPlease provide your answer to the question: {question}"
     },
     "arch_ru": {
-      "data_path": "data/documents/russian_data_clean",
-      "chroma_root_path": "data/chroma/russian_data_clean_chroma",
-      "embedding_model": "openai",
+      "data_path": "data/documents/arch_data-ru",
+      "chroma_root_path": "data/chroma/arch_data-ru_chroma",
+      "embedding_model": "voyage-multilingual-2",
       "llm_model": "gpt-3.5-turbo",
       "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nPlease provide your answer to the question: {question}"
     },
     "test": {
       "data_path": "data/documents/test_data",
       "chroma_root_path": "data/chroma/test_chroma",
-      "embedding_model": "voyage-law-2",
+      "embedding_model": "voyage-multilingual-2",
       "llm_model": "gpt-3.5-turbo",
       "prompt_template": "Answer the question based only on the following context:\n\n{context}\n\n---\n\nPlease provide your answer to the question: {question}"
     }

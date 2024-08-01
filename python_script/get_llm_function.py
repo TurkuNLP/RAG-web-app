@@ -20,9 +20,10 @@ def get_llm_function(model_name = LLM_MODEL):
     - nvidia/Llama3-ChatQA-1.5-8B
     - gpt-3.5-turbo
     Other models can of course be implemented later"""
+
     global global_model
     if (model_name == "mistralai/Mixtral-8x7B-Instruct-v0.1" or model_name == "mistralai/Mistral-7B-Instruct-v0.1"):
-        if global_model is None:            
+        if global_model is None:
             tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True, token=HF_API_TOKEN)
             tokenizer.pad_token = tokenizer.eos_token
             tokenizer.padding_side = "right"

@@ -1,0 +1,264 @@
+/* Left Sidebar Specific Styles */
+.sidebar-left {
+  max-width: 25rem !important;
+  left: 0;
+}
+.sidebar-left .icon{
+  filter: var(--white-svg);
+}
+
+/* Closed State Styles */
+.left-sidebar-closed .sidebar-left.nav {
+  overflow-y: visible;
+}
+.left-sidebar-closed .sidebar-left .nav-item:not(.logo-holder) {
+  display: none !important;
+}
+.left-sidebar-closed .sidebar-left #sidebarToggleHolder {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  padding: 1.5rem;
+  z-index: 999;
+  float: none !important;
+}
+.left-sidebar-closed .sidebar-left #sidebarToggleHolder .icon{
+  filter: var(--black-svg);
+  transform: rotate(180deg);
+}
+.left-sidebar-closed.right-sidebar-closed.small .sidebar-left #sidebarToggleHolder .icon{
+  filter: var(--black-svg);
+  transform: rotate(180deg);
+}
+.left-sidebar-closed.small .sidebar-left #sidebarToggleHolder .icon{
+  filter: var(--white-svg);
+  transform: rotate(180deg);
+}
+.left-sidebar-closed .sidebar-left .logo #title {
+  display: none;
+}
+.left-sidebar-closed .sidebar-left {
+  width: 0 !important;
+}
+.left-sidebar-closed .sidebar-left .nav-body{
+  display: none;
+}
+
+/* Nav Body Styles */
+.sidebar-left .nav-body .card {
+  background-color: var(--primary-color);
+  border: none;
+}
+.sidebar-left .nav-body .card-header {
+  background-color: var(--primary-color);
+  border: none;
+  display: inline-flex;
+  padding: 0;
+  font-size: 1rem;
+  width: 100%;
+}
+.sidebar-left .nav-body .database-header, .sidebar-left .nav-body .history-header {
+  margin-top: 0.5rem;
+}
+.sidebar-left .nav-body .card-header.collapse-open {
+  background-color: var(--primary-color-light);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+.sidebar-left .nav-body .card-header:hover {
+  background-color: var(--primary-color-light);
+  border-radius: 1rem;
+}
+.sidebar-left .nav-body .card-header.collapse-open:hover {
+  background-color: var(--primary-color-light);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.sidebar-left .nav-body .card-header .icon {
+  margin-left: 1rem;
+  margin-right: 1.5rem;
+}
+/* Btn & icon Settings/HIstory/Database */
+.sidebar-left .nav-body .btn-menu {
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0.7rem solid transparent;
+}
+.sidebar-left .nav-body .btn-menu:focus {
+  box-shadow: none;
+}
+.sidebar-left .nav-body .btn-menu.doc {
+  width: auto;
+}
+.sidebar-left .nav-body .btn-menu {
+  border-left: 0 !important;
+}
+.sidebar-left .nav-body .btn-menu {
+  color: transparent;
+}
+/* Clear btn */
+.sidebar-left .nav-body .clear-btn {
+  color: white;
+  border: 0.1rem solid white;
+  border-radius: 1rem;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.sidebar-left .nav-body .clear-btn:hover {
+  color: var(--primary-color-light);
+  background-color: var(--white);
+}
+.sidebar-left .nav-body .clear-btn:hover .icon {
+  filter: var(--primary-color-light-svg);
+}
+.sidebar-left .nav-body .clear-btn li{
+  padding: 0.5rem;
+}
+.sidebar-left .nav-body .clear-btn .icon {
+  width: 20px;
+  margin: 0 0.5rem;
+}
+.sidebar-left .nav-body .form-check {
+  padding-bottom: 0.5rem;
+}
+.sidebar-left .nav-body .card-body {
+  background-color: var(--primary-color-light);
+  padding: 0.5rem 0.5rem;
+  padding-top: 0;
+  position: relative;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+}
+.sidebar-left .nav-body .card-body.database {
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.sidebar-left .nav-body .card-body .database-item {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sidebar-left .nav-body .card-body .database-item .fa {
+  padding: 0.5rem;
+}
+.sidebar-left .nav-body .card-body .database-item .icon{
+  width: 20px;
+  height: 20px;
+  margin: 0rem 0.2rem;
+  filter: var(--white-svg);
+}
+.sidebar-left .nav-body .card-body .database-item a{
+  color: var(--white);
+  text-decoration: none;
+}
+.sidebar-left .nav-body .card-body .database-item a:hover{
+  color: #ffffff94;
+}
+.sidebar-left .nav-body .card-body .settings-item {
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0.5rem;
+  border: 0.05rem solid #ffffff3a;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+  opacity: 1;
+}
+.sidebar-left .nav-body .card-body .settings-item select#searchTypeDropdown {
+  margin-top: 0.3rem;
+  margin-bottom: 0.7rem;
+}
+/* Transition */
+.sidebar-left .nav-body .card-body .settings-item .hidden {
+  display: none;
+}
+.fade-enter {
+  transition: opacity 0.3s ease-in;
+}
+.fade-leave {
+  transition: opacity 0.3s ease-out;
+}
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+}
+.fade-leave {
+  opacity: 1;
+}
+.fade-leave-active {
+  opacity: 0;
+}
+/* End Transition */
+.sidebar-left .nav-body .card-body .settings-item.last-item {
+  margin-bottom: 0rem;
+}
+.sidebar-left .nav-body .card-body .settings-item .slider-container {
+  display: flex;
+  align-items: center;
+}
+.sidebar-left .nav-body .card-body #chunkSliderValue,
+.sidebar-left .nav-body .card-body #precisionSliderValue{
+  font-weight: bold;
+}
+.slider-container input[type="range"] {
+  flex: 1;
+  margin: 0 10px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 0.5rem;
+  border-radius: 5px;
+  outline: none;
+}
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  background: var(--white);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  background: #343a40;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.slider-container input[type="number"] {
+  width: 70px;
+}
+.sidebar-left .nav-body .database .shadeoverlay {
+  position: absolute;
+  top: 0;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #5b71d600 0%, #5b71d600 70%, var(--primary-color-light) 93%);
+  border-radius: 1rem;
+  pointer-events: none;
+}
+
+/* Accordion Styles */
+.sidebar-left .accordion .card-header {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.sidebar-left .form-select {
+  border-radius: 1rem;
+  padding: 0.3rem 1rem;
+  color: var(--primary-color-light);
+  
+}
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}

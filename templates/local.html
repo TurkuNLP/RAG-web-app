@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Sidebar Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome5-overrides.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbox.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-left.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-right.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora">
+</head>
+
+
+
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="black-background hidden"></div>
+
+    <!-- Left Sidebar -->
+    <ul class="nav flex-column shadow d-flex sidebar-left">
+        <div class="nav-header">
+            <li class="nav-item logo-holder">
+                <div class="text-center text-white logo">
+                    <a class="text-white float-start" id="sidebarToggleHolder" href="#">
+                        <img src="static/img/menu.svg" alt="menubar" class="icon" id="leftSidebarToggle">
+                    </a>
+                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Sidebar</strong></a>
+                </div>
+            </li>
+        </div>
+        <div class="nav-body">
+            <div class="accordion">
+                <div class="card">
+                    <div class="card-header settings-header collapse-open" id="settingsHeader">
+                        <button class="btn btn-menu text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="true" aria-controls="collapseSettings">
+                            <span class="float-start">
+                                <img src="static/img/setting.svg" alt="setting button" class="icon">Settings
+                            </span>
+                            <i class="fas fa-caret-down float-end"></i>
+                        </button>
+                    </div>
+                    <div id="collapseSettings" class="collapse show" aria-labelledby="settingsHeader">
+                        <div class="card-body text-white text-justify settings">
+                            <li class="settings-item">
+                                <label for="searchTypeDropdown">
+                                    <img src="static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Defines the type of search the Retriever should perform. Options are: <br>
+                                    - 'similarity': finds the most similar documents<br>
+                                    - 'mmr': maximizes relevance and diversity<br>
+                                    - 'similarity_score_threshold': retrieves documents above a certain relevance score.">
+                                    Search type:
+                                </label>
+                                <select class="form-select" id="searchTypeDropdown">
+                                    <option value="similarity">Similarity</option>
+                                    <option value="similarity_score_threshold">Similarity score threshold</option>
+                                    <option value="mmr">MMR</option>
+                                </select>
+                                
+                                <div id="similarityContent">
+                                    <div class="slider-value">
+                                        <img src="static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Amount of documents to return">Number of retrieved chunks: <span id="similaritySliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="similaritySlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
+                                </div>
+                                
+                                <div id="similarityScoreContent" class="hidden">
+                                    <div class="slider-value">
+                                        <img src="static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Minimum relevance threshold to fetch documents">Similarity score required: <span id="similarityScoreSliderValue">1</span>%
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1%</span>
+                                        <input type="range" class="form-range" id="similarityScoreSlider" min="1" max="100" step="1">
+                                        <span id="maxValue">100%</span>
+                                    </div>
+                                    <div class="slider-value">
+                                        <img src="{{ url_for('static', filename='img/information-circle.svg') }}" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Max amount of documents to return">Max number of retrieved chunks: <span id="maxChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="maxChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
+                                </div>
+
+                                <div id="mmrContent" class="hidden">
+                                    <div class="slider-value">
+                                        <img src="static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Fetch more documents for the MMR algorithm to consider <br>Only return the top documents based on the amount defined below">Considered chunks: <span id="consideredChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="consideredChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
+                                    <div class="slider-value">
+                                        <img src="static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Define the amount of document to return">Retrieved chunks: <span id="retrievedChunkSliderValue">1</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1</span>
+                                        <input type="range" class="form-range" id="retrievedChunkSlider" min="1" max="30" step="1">
+                                        <span id="maxValue">30</span>
+                                    </div>
+                                    <div class="slider-value">
+                                        <img src="static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Diversity of results returned by MMR<br>1 for minimum diversity and 0 for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%
+                                    </div>
+                                    <div class="slider-container">
+                                        <span id="minValue">1%</span>
+                                        <input type="range" class="form-range" id="lambdaSlider" min="1" max="100" step="1">
+                                        <span id="maxValue">100%</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="settings-item">
+                                <label for="embeddingModelDropdown">Embedding model:</label>
+                                <select class="form-select" id="embeddingModelDropdown">
+                                    <option value="openai">Openai</option>
+                                    <option value="voyage-law-2">Voyage Law 2</option>
+                                    <option value="voyage-multilingual-2">Voyage Multilingual 2</option>
+                                </select>
+                            </li>
+                            <li class="settings-item last-item">
+                                <label for="llmModelDropdown">LLM model:</label>
+                                <select class="form-select" id="llmModelDropdown">
+                                    <option value="gpt-3.5-turbo">ChatGPT 3.5</option>
+                                    <option value="nvidia/Llama3-ChatQA-1.5-8B">Llama3 ChatQA 1.5 8B</option>
+                                    <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral 8x7B Instruct v0</option>
+                                    <option value="mistralai/Mistral-7B-Instruct-v0.1">Mistral 7B Instruct v0.1</option>
+                                </select>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header history-header collapse-open" id="historyHeader">
+                        <button class="btn btn-menu text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory" aria-expanded="false" aria-controls="collapseHistory">
+                            <span class="float-start">
+                                <img src="{{ url_for('static', filename='img/message-multiple.svg') }}" alt="chat history" class="icon">Chat History
+                            </span>
+                            <i class="fas fa-caret-down float-end"></i>
+                        </button>
+                    </div>
+                    <div id="collapseHistory" class="collapse" aria-labelledby="historyHeader">
+                        <div class="card-body text-white text-justify history">
+                            <li class="history-items">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="flexSwitchHistory" checked>
+                                    <label class="form-check-label" for="flexSwitchHistory">Activate Chat History</label>
+                                </div>
+                            </li>
+                            <li class="history-items">
+                                <button class="btn clear-btn" id="clear-btn" type="button"><img src="{{ url_for('static', filename='img/delete.svg') }}" alt="delete" class="icon">Clear Chat History</button>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header database-header collapse-open" id="databaseHeader">
+                        <button class="btn btn-menu text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDatabase" aria-expanded="false" aria-controls="collapseDatabase">
+                            <span class="float-start">
+                                <img src="static/img/folder.svg" alt="database button" class="icon">Database
+                            </span>
+                            <i class="fas fa-caret-down float-end"></i>
+                        </button>
+                    </div>
+                    <div id="collapseDatabase" class="collapse" aria-labelledby="databaseHeader">
+                        <div class="card-body text-white text-justify database">
+                            <div class="shadeoverlay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-footer">
+            <li class="nav-item">
+                <a class="nav-link text-left text-white py-1 px-0" href="#">
+                    <img src="static/img/logout.svg" alt="logout button" class="icon mx-3">
+                    <span class="text-nowrap mx-2">Log out</span>
+                </a>
+            </li>
+        </div>
+    </ul>
+
+    <!-- Chatbox -->
+    <div class="container-fluid h-100 chat">
+        <div class="row h-100 d-flex justify-content-center">
+            <div class="col-lg-10 col-xl-8 chat h-100 d-flex flex-column">
+                <div class="card h-100 w-100 d-flex flex-column">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Turku NLP RAG</span>
+                    </div>
+                    <div class="card-body flex-grow-1" data-perfect-scrollbar-init>
+                        <ul class="chatbox list-unstyled">
+                        </ul>
+                    </div>
+                    <div class="card-footer text-muted d-flex justify-content-start align-items-center">
+                        <div class="chat-input-container">
+                            <textarea id="chatInput" class="form-control" placeholder="Type message" rows="1"></textarea>
+                            <button class="btn ms-2 send-btn" id="send-btn">
+                                <img src="static/img/sent.svg" alt="send button" class="icon">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <ul class="nav flex-column shadow d-flex sidebar-right">
+        <div class="nav-header">
+            <li class="nav-item logo-holder">
+                <div class="text-center text-white logo">
+                    <a class="text-white text-decoration-none" id="title" href="#"><strong>Context Menu</strong></a>
+                    <a class="text-white float-end" id="sidebarToggleHolder" href="#">
+                        <img src="static/img/menu.svg" alt="menubar" class="icon" id="rightSidebarToggle">
+                    </a>
+                </div>
+            </li>
+        </div>
+        <div class="nav-body">
+            <div class="accordion context-retriever">
+                <div class="card-header collapse-open" id="heading1">
+                    <a><img class="icon download-icon" src="static/img/alert-diamond.svg"></a>
+                    <button class="btn btn-menu text-white context" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                        <span class="float-start mx-2">The different retrieved text chunks will appear in this menu</span><i class="fas fa-caret-down float-end"></i>
+                    </button>
+                </div>
+                <div id="collapse1" class="collapse show" aria-labelledby="heading1">
+                    <div class="card-body text-white text-justify">You can show or hide each text chunk by clicking on it.<br>You can also view and/or download the document to which the text section belongs by clicking the download button.</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-footer">
+            <!-- Add footer content if necessary -->
+        </div>
+    </ul>
+    <script>
+        var root = "{{ root }}";
+    </script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

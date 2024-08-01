@@ -1,0 +1,122 @@
+/* Right Sidebar and Context Retriever Specific Styles */
+.sidebar-right {
+  width: 35vw !important;
+  right: 0;
+  z-index: 1;
+}
+.sidebar-right .icon{
+  filter: var(--white-svg);
+}
+
+/* Closed State Styles */
+.right-sidebar-closed .sidebar-right .nav-item:not(.logo-holder) {
+  display: none !important;
+}
+.right-sidebar-closed .sidebar-right #sidebarToggleHolder {
+  position: absolute !important;
+  color: #858791 !important;
+  right: 0;
+  top: 0;
+  padding: 1.5rem;
+  z-index: 999;
+  float: none !important;
+}.right-sidebar-closed .sidebar-right #sidebarToggleHolder .icon{
+  filter: var(--black-svg);
+  transform: rotate(0deg);
+}
+.right-sidebar-closed .sidebar-right .logo #title {
+  display: none;
+}
+.right-sidebar-closed .sidebar-right {
+  width: 0 !important;
+  overflow-y: visible;
+}
+.right-sidebar-closed .sidebar-right .context-retriever {
+  display: none !important;
+}
+
+/* Responsive Styles */
+.sidebar-right.medium {
+  width: 50vw !important;
+}
+.sidebar-right.mobile {
+  width: 100vw !important;
+}
+
+/* Nav Body Styles */
+.sidebar-right #sidebarToggleHolder .icon{
+  filter: var(--white-svg);
+  transform: rotate(180deg);
+}
+.sidebar-right .nav-body .card-header.collapse-open {
+  background-color: #5b72d6;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+.sidebar-right .nav-body .card-header.search-card:hover {
+  background-color: #455dc7;
+  border-radius: 1rem;
+}
+.sidebar-right .nav-body .card-header.collapse-open:hover {
+  background-color: #5b72d6;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.sidebar-right .nav-body .card-body {
+  background-color: #5b72d6;
+  position: relative;
+  padding: 1rem 2rem;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+}
+
+/* Context Retriever Styles */
+.sidebar-right .context-retriever .card {
+  background-color: #455dc7;
+  border: none;
+}
+.sidebar-right .context-retriever .card-header {
+  background-color: #455dc7;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+.sidebar-right .context-retriever .card-header .download-icon{
+  box-sizing: border-box;
+  border: 0.7rem solid transparent;
+}
+/*
+.sidebar-right .context-retriever .card-header#heading1 {
+  margin-top: 0;
+}*/
+.sidebar-right .context-retriever .card-header:hover {
+  background-color: #5b72d6;
+  border-radius: 1rem;
+}
+.sidebar-right .context-retriever .btn {
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0.7rem solid transparent;
+}
+.sidebar-right .context-retriever .btn:focus {
+  box-shadow: none;
+}
+.sidebar-right .context-retriever .btn.doc {
+  width: auto;
+}
+.sidebar-right .context-retriever .btn.context {
+  border-left: 0 !important;
+}
+.sidebar-right .context-retriever .btn-link {
+  color: transparent;
+}
+.sidebar-right .context-retriever .context .fa {
+  padding-right: 0.3rem;
+}
