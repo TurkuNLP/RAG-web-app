@@ -62,7 +62,7 @@ class ConversationalRagChain(Chain):
             **kwargs,
         )
 
-    def format_standalone_response(self, response):
+    def format_standalone_response(self, response) -> str:
         """Removes the prompt from the generated response"""
 
         end_marker = "<|endofprompt|>"

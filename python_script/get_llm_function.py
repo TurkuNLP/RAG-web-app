@@ -31,7 +31,7 @@ def get_llm_function(model_name = LLM_MODEL):
             #################################################################
             # bitsandbytes parameters
             #################################################################
-            """
+
             # Activate 4-bit precision base model loading
             use_4bit = True
             
@@ -64,7 +64,7 @@ def get_llm_function(model_name = LLM_MODEL):
                     print("=" * 80)
                     print("Your GPU supports bfloat16: accelerate training with bf16=True")
                     print("=" * 80)
-            """
+
             model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 token = HF_API_TOKEN,
@@ -107,6 +107,5 @@ def get_llm_function(model_name = LLM_MODEL):
         return model
     
     else:
-        # TODO create error message
-        print("Error no model founded")
+        print(f'Model "{model_name}" is not implemented on the system.')
         return

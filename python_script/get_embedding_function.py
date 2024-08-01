@@ -22,7 +22,6 @@ def get_embedding_function(model_name = "voyage"):
         embeddings = VoyageAIEmbeddings(model="voyage-multilingual-2")        
         
     else:
-        # TODO create error message
-        print("You have to chose a model")
+        print(f'Model "{model_name}" is not implemented on the system.')
         return
     return embeddings

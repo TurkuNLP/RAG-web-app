@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /** 
      * Binds the close event on click for all close buttons
-     * @param {number} numberOfDocuments - The number of documents/close button
+     * @param {number} numberOfDocuments - The number of documents = number of close buttons
      */
     function setupCloseEventListener(numberOfDocuments) {
         for (let i = 1; i <= numberOfDocuments; i++) {

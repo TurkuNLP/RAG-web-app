@@ -43,6 +43,7 @@ def load_config(config_name = 'default', show_config = False):
     Embeddings models : - "sentence-transformers/all-mpnet-base-v2"
                         - "openai"
                         - "voyage-law-2"
+                        - "voyage-multilingual-2"
     LLM models :    - "gpt-3.5-turbo"
                     - "mistralai/Mistral-7B-Instruct-v0.1"
                     - "mistralai/Mixtral-8x7B-Instruct-v0.1"

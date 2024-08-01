@@ -11,6 +11,35 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 def get_rag_chain(params = None):
+    """
+    Creates RAG chain for question-answering tasks using specified models and settings.
+     
+    configures the retriever to fetch relevant documents based on similarity, similarity with a score threshold,
+    orMaximal Marginal Relevance (MMR).
+    
+    The function also supports context-aware question reformulation if chat history is utilized.
+
+    Parameters:
+        params (dict, optional): A dictionary of configuration parameters.
+            - chroma_root_path (str): The root path for Chroma data storage.
+            - embedding_model (str): The model name for the embedding function.
+            - llm_model (str): The model name for the language model.
+            - search_type (str): The type of search to perform. Options are:
+                - "similarity": Retrieve based on document similarity.
+                - "similarity_score_threshold": Retrieve based on similarity with a score threshold.
+                - "mmr": Retrieve using Maximal Marginal Relevance.
+            - similarity_doc_nb (int): Number of documents to return for similarity search.
+            - score_threshold (float): The score threshold for filtering documents in "similarity_score_threshold" mode.
+            - max_chunk_return (int): Maximum number of chunks to return.
+            - considered_chunk (int): Number of chunks to consider in MMR search.
+            - mmr_doc_nb (int): Number of documents to return for MMR search.
+            - lambda_mult (float): The trade-off parameter between relevance and diversity in MMR.
+            - isHistoryOn (bool): Indicates if history-based question reformulation is enabled.
+
+    Returns:
+        A RAG chain object ready for processing question-answering tasks.
+    """
+    
     default_params = {
         "chroma_root_path": CHROMA_ROOT_PATH,
         "embedding_model": EMBEDDING_MODEL,

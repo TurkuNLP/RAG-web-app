@@ -2,9 +2,10 @@ import argparse
 import os
 import shutil
 
+import fitz
 from tqdm import tqdm
-from langchain.schema.document import Document
 
+from langchain.schema.document import Document
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain.document_loaders.pdf import PyPDFLoader
 from langchain.document_loaders.pdf import PDFPlumberLoader
@@ -24,29 +25,25 @@ def main():
     args = parser.parse_args()
 
     if args.clear:
-        print("✨ Clearing Database")
+        print("Clearing Database...")
         if args.config:
-            # Clear the specific subfolder specified in the config
             load_config(args.config)
             subfolder_name = "chroma_{}".format(EMBEDDING_MODEL)
             clear_database(subfolder_name)
         else:
-            # Clear the whole database
             clear_database()
         return
 
     if args.config:
         load_config(args.config)
         if args.reset:
-            # Clear the existing database existing for the specified config
             subfolder_name = "chroma_{}".format(EMBEDDING_MODEL)
-            print("✨ Reseting Database")
+            print("Reseting Database...")
             try:
                 clear_database(subfolder_name)
             except FolderNotFoundError as e:
                 print(e)
 
-        # Create (or update) the data store.
         documents = load_documents()
         chunks = split_documents(documents)
         add_to_chroma(chunks)
@@ -128,11 +125,10 @@ def add_to_chroma(chunks: list[Document]):
         persist_directory=find_chroma_path(EMBEDDING_MODEL,CHROMA_ROOT_PATH), embedding_function=get_embedding_function(EMBEDDING_MODEL)
     )
 
-    # Calculate Page IDs.
     chunks_with_ids = calculate_chunk_ids(chunks)
 
     # Add or Update the documents.
-    existing_items = db.get(include=[])  # IDs are always included by default
+    existing_items = db.get(include=[])
     existing_ids = set(existing_items["ids"])
     print(f"Number of existing documents in DB: {len(existing_ids)}")
 
@@ -150,7 +146,7 @@ def add_to_chroma(chunks: list[Document]):
                 pbar.update(len(batch))
 
     else:
-        print("✅ No new documents to add")
+        print("Done. No new documents to add")
 
 
 def calculate_chunk_ids(chunks):
@@ -189,10 +185,9 @@ def find_chroma_path(model_name, base_path):
             base_path = CHROMA_ROOT_PATH
         except:
             raise ValueError("The Chroma database root file is not populated")
-    # Set model_path
+        
     model_path = os.path.join(base_path, f"chroma_{model_name}")
     if not os.path.exists(model_path):
-        # Create folder if doesn't exist
         os.makedirs(model_path)
     return model_path
 
@@ -225,6 +220,9 @@ def clear_database(chroma_subfolder_name = None):
 
 
 class ProgressPyPDFDirectoryLoader(PyPDFDirectoryLoader):
+    """
+    Custom PyPDFDirectoryLoader that changes the basic loader to PDFPlumberLoader which allow us to get all the metadata
+    """
     def load(self) -> List[Document]:
         p = Path(self.path)
         docs = []
@@ -241,7 +239,7 @@ class ProgressPyPDFDirectoryLoader(PyPDFDirectoryLoader):
                                 if 'source' in doc.metadata:
                                     doc.metadata['source'] = i.name
                                     doc.metadata['file_name'] = doc.metadata.pop('source')
-                                doc.metadata.pop('file_path',None)
+                                #doc.metadata.pop('file_path',None)
                                 doc.metadata = {key: value for key, value in doc.metadata.items() if value}
                             docs.extend(sub_docs)
                         except Exception as e:
