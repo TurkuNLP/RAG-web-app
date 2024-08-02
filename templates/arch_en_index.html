@@ -122,7 +122,8 @@
                                 <select class="form-select" id="embeddingModelDropdown">
                                     <option value="openai">Openai</option>
                                     <option value="voyage-law-2">Voyage Law 2</option>
-                                    <option value="voyage-multilingual-2">Voyage Multilingual 2</option>
+                                    <!--<option value="voyage-multilingual-2">Voyage Multilingual 2</option>
+                                -->
                                 </select>
                             </li>
                             <li class="settings-item last-item">
@@ -232,6 +233,8 @@
                 <div id="collapse1" class="collapse show" aria-labelledby="heading1">
                     <div class="card-body text-white text-justify">
                         You can show or hide each text chunk by clicking on it.<br>You can also view and/or download the document to which the text chunk belongs by clicking the download button.
+                        <!-- <div class="card-footer text-white"><a><img class="icon download-icon" src="{{ root }}/static/img/download.svg"></a><a><img class="icon download-icon" src="{{ root }}/static/img/view.svg"></a><a><img class="icon download-icon" src="{{ root }}/static/img/cancel.svg"></a></div>
+                    -->
                     </div>
                     
                 </div>
@@ -244,6 +247,7 @@
     <script>
         var root = "{{ root }}";
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <script src="{{ root }}/static/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="{{ root }}/static/js/script.js"></script>
 </body>

@@ -25,7 +25,7 @@ class ConversationalRagChain(Chain):
     input_key: str = "query"
     output_key: str = "result"
     context_key: str = "context"
-    source_key: str = "source"
+    metadatas_key: str = "metadatas"
 
     chat_history = []
     
@@ -37,7 +37,7 @@ class ConversationalRagChain(Chain):
     @property
     def output_keys(self) -> List[str]:
         """Output keys."""
-        return [self.output_key, self.context_key, self.source_key]
+        return [self.output_key, self.context_key, self.metadatas_key]
 
     @property
     def _chain_type(self) -> str:
@@ -62,7 +62,7 @@ class ConversationalRagChain(Chain):
             **kwargs,
         )
 
-    def format_standalone_response(self, response):
+    def format_standalone_response(self, response) -> str:
         """Removes the prompt from the generated response"""
 
         end_marker = "<|endofprompt|>"
@@ -73,7 +73,7 @@ class ConversationalRagChain(Chain):
 
     def format_outputs(self, output: Dict[str, Any]):
         """Removes the prompt from the generated response
-        Regroups the contexts and sources of different documents in dedicated lists."""
+        Regroups the contexts and metadatas of different documents in dedicated lists."""
 
         answer = output["answer"]
         AI_marker = "Assistant: "
@@ -88,15 +88,17 @@ class ConversationalRagChain(Chain):
             
         documents = output['context']
         contexts = []
-        sources = []
+        metadatas = []
         for doc in documents:
             contexts.append(doc.page_content)
-            # TODO Update database which has the last metadata storage system
             try:
-                sources.append(doc.metadata['file_name'])
+                metadatas.append(doc.metadata)
             except:
-                sources.append(doc.metadata['source'])
-        return answer,contexts,sources
+                # TODO Update database which has the last metadata storage system
+                # TODO Delete this section when alla databases will be updated
+                print("Conflict version between new and last metadata storage in the database")
+                print("You have to update the database")
+        return answer,contexts,metadatas
 
     def update_chat_history(self, user_question, bot_response):
         """Update the chat history"""
@@ -108,15 +110,15 @@ class ConversationalRagChain(Chain):
         self.chat_history = []
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
-        """Call the chain. Return a dict with answer, context and source"""
+        """Call the chain. Return a dict with answer, context and metadatas"""
         chat_history = self.chat_history
         question = inputs[self.input_key]
 
         output = self.rag_chain.invoke({"input": question, "chat_history": chat_history})
-        answer,contexts,sources = self.format_outputs(output)
+        answer,contexts,metadatas = self.format_outputs(output)
 
         if not contexts:
             answer = "No context found, try rephrasing your question"
             
         self.update_chat_history(question, answer) 
-        return {self.output_key: answer, self.context_key: contexts, self.source_key: sources}
+        return {self.output_key: answer, self.context_key: contexts, self.metadatas_key: metadatas}
