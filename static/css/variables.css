@@ -1,7 +1,8 @@
 :root{
     /*===== Colors =====*/
-    --white: #FFF;
+    --white: #ffffff;
     --white-svg: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(0%) hue-rotate(161deg) brightness(101%) contrast(104%);
+    --black: #000000;
     --black-svg: brightness(0) saturate(100%);
     --primary-color: #455dc7;
     --primary-color-svg: brightness(0) saturate(100%) invert(39%) sepia(15%) saturate(6445%) hue-rotate(213deg) brightness(81%) contrast(91%);

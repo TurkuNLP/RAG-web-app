@@ -172,3 +172,8 @@ canvas {
   background-color: var(--white);
   transition: background-color 0.5s ease-in-out;
 }
+.page-span {
+  color: var(--black);
+  width: 100%;
+  text-wrap: nowrap;
+}

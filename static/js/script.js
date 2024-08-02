@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
      * Initializes the main settings and elements when the page is loaded.
      */
     function init() {
-        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 25, 'voyage-multilingual-2', 'gpt-3.5-turbo');
+        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 25, 'openai', 'gpt-3.5-turbo');
         clearChatHistory(true);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
@@ -342,10 +342,11 @@ document.addEventListener("DOMContentLoaded", function() {
             let pdfDoc = null,
                 pageNum = parseInt(pageNumber) || 1,
                 pageCount = 0,
-                scale = 1;
+                scale = 0.9;
 
             const canvas = document.getElementById(`pdf-canvas-${viewNumber}`);
             var context = canvas.getContext('2d');
+            const pageSpan = document.getElementById(`page-info-${viewNumber}`);
 
             function renderPage(num) {
                 pdfDoc.getPage(num).then(function (page) {
@@ -357,6 +358,10 @@ document.addEventListener("DOMContentLoaded", function() {
                         canvasContext: context,
                         viewport: viewport
                     };
+
+                    pageSpan.innerHTML = '';
+                    pageSpan.textContent = `${num}/${pageCount}`;
+
                     page.render(renderContext).promise.then(function () {              
                     });
                 });
@@ -642,6 +647,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 prevButton.className = 'btn';
                 prevButton.appendChild(prevIcon);
 
+                const pageInfo = document.createElement('span');
+                pageInfo.id = `page-info-${contextNumber}`;
+                pageInfo.className = 'page-span';
+
                 const nextButton = document.createElement('button');
                 const nextIcon = document.createElement('img');
                 nextIcon.className = 'icon-pdf';
@@ -674,9 +683,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Append buttons to cardFooter
                 cardFooter.appendChild(viewButton);
                 changePageBtnDiv.appendChild(prevButton);
+                changePageBtnDiv.appendChild(pageInfo);
                 changePageBtnDiv.appendChild(nextButton);
-                zoomBtnDiv.appendChild(zoomInButton);
                 zoomBtnDiv.appendChild(zoomOutButton);
+                zoomBtnDiv.appendChild(zoomInButton);
                 //cardFooter.appendChild(fullscreenButton);
                 pdfBtnDiv.appendChild(changePageBtnDiv);
                 pdfBtnDiv.appendChild(zoomBtnDiv);
