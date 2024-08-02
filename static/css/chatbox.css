@@ -1,8 +1,4 @@
-:root{
-  /*===== Colors =====*/
-  --light-grey: rgb(221, 221, 221);
-  --grey: rgb(176, 176, 176);
-}
+@import url('variables.css');
 
 /* Chatbox Styles */
 .chat .container-fluid {

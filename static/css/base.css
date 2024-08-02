@@ -1,14 +1,4 @@
-:root{
-  /*===== Colors =====*/
-  --white: #FFF;
-  --white-svg: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(0%) hue-rotate(161deg) brightness(101%) contrast(104%);
-  --black-svg: brightness(0) saturate(100%);
-  --primary-color: #455dc7;
-  --primary-color-svg: brightness(0) saturate(100%) invert(39%) sepia(15%) saturate(6445%) hue-rotate(213deg) brightness(81%) contrast(91%);
-  --primary-color-light: #5b72d6;
-  --primary-color-light-svg : brightness(0) saturate(100%) invert(49%) sepia(28%) saturate(5650%) hue-rotate(211deg) brightness(89%) contrast(86%);
-  --background-color: rgba(0, 0, 0, 0.5);
-}
+@import url('variables.css');
 
 /* Base Styles */
 html, body {
@@ -127,4 +117,8 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.icon{
+  filter: var(--white-svg);
 }

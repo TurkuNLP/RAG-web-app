@@ -262,12 +262,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     /** 
      * Manages the visibility of different context panels
-     * @param {number} numberOfDocuments - The number of documents 
+     * @param {number} newDocs - The number of new context windows to configure.
+     * @param {number} numberOfDocumentsBefore - Previous number of documents.
      */
-    function setupContextCollapseEvents(numberOfDocuments) {
-        for (let i = 1; i <= numberOfDocuments; i++) {
-            const collapseId = `collapse${i}`;
-            const headingId = `heading${i}`;
+    function setupContextCollapseEvents(newDocs, numberOfDocumentsBefore) {
+        for (let docNum = numberOfDocumentsBefore+1; docNum <= numberOfDocumentsBefore+newDocs; docNum++) {
+            const collapseId = `collapse${docNum}`;
+            const headingId = `heading${docNum}`;
             const collapseElement = document.getElementById(collapseId);
             const headingElement = document.getElementById(headingId);
             if (collapseElement && headingElement) {
@@ -285,15 +286,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /** 
      * Binds the close event on click for all close buttons
-     * @param {number} numberOfDocuments - The number of documents = number of close buttons
+     * @param {number} newDocs - The number of new close buttons to configure.
+     * @param {number} numberOfDocumentsBefore - Previous number of documents.
      */
-    function setupCloseEventListener(numberOfDocuments) {
-        for (let i = 1; i <= numberOfDocuments; i++) {
-            const closeButton = document.getElementById(`close${i}`);
+    function setupCloseEventListener(newDocs, numberOfDocumentsBefore) {
+        for (let docNum = numberOfDocumentsBefore+1; docNum <= numberOfDocumentsBefore+newDocs; docNum++) {
+            const closeButton = document.getElementById(`close${docNum}`);
             if (closeButton) {
                 closeButton.addEventListener('click', () => {
-                    const collapseElement = document.getElementById(`collapse${i}`);
-                    const headingElement = document.getElementById(`heading${i}`);
+                    const collapseElement = document.getElementById(`collapse${docNum}`);
+                    const headingElement = document.getElementById(`heading${docNum}`);
                     if (collapseElement) {
                         collapseElement.parentNode.removeChild(collapseElement);
                     }
@@ -306,15 +308,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /** 
-     * Binds the close event on click for all close buttons
-     * @param {number} numberOfDocuments - The number of documents = number of close buttons
+     * Binds the pdf diplay event on click for all new view buttons
+     * @param {number} newDocs - The number of new view buttons to configure.
+     * @param {number} numberOfDocumentsBefore - Previous number of documents.
      */
-    function setupViewEventListener(numberOfDocuments) {
-        for (let docNumber = 1; docNumber <= numberOfDocuments; docNumber++) {
-            const viewButton = document.getElementById(`view${docNumber}`);
+    function setupViewEventListener(newDocs, numberOfDocumentsBefore) {
+        for (let docNum = numberOfDocumentsBefore+1; docNum <= numberOfDocumentsBefore+newDocs; docNum++) {
+            const viewButton = document.getElementById(`view${docNum}`);
             if (viewButton) {
-                displayPDF(viewButton.getAttribute('data-document-name'), viewButton.getAttribute('data-page-number'), docNumber);
-                const viewContainer = document.getElementById(`pdf-${docNumber}`);
+                displayPDF(viewButton.getAttribute('data-document-name'), viewButton.getAttribute('data-page-number'), docNum);
+                const viewContainer = document.getElementById(`pdf-${docNum}`);
                 viewButton.addEventListener('click', () => {
                     viewContainer.classList.toggle('hide');
                 });
@@ -324,6 +327,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /** 
      * Assigns the pdf to the right button to allow user to display it
+     * Add event listener to all the buttons associated to the pdf
      * @param {string} documentName - Name of the document
      * @param {number} pageNumber - Page number where the chunk is located
      * @param {number} viewNumber - Number of the element on the webpage
@@ -332,31 +336,80 @@ document.addEventListener("DOMContentLoaded", function() {
         const documentData = await getDocument(documentName);
         if (documentData && documentData.url) {
             var url = documentData.url;
-            console.log(url);
             var pdfjsLib = window['pdfjs-dist/build/pdf'];
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
-            var loadingTask = pdfjsLib.getDocument(url);
-            loadingTask.promise.then(function(pdf) {
-                // TODO fix the page system, the one Antonin converted are wrong and need pageNumber+1
-                pdf.getPage(parseInt(pageNumber, 10)+1).then(function(page) {
-                    var scale = 1;
-                    var viewport = page.getViewport({ scale: scale });
+            let pdfDoc = null,
+                pageNum = parseInt(pageNumber) || 1,
+                pageCount = 0,
+                scale = 1;
 
-                    var canvas = document.getElementById(`pdf-canvas-${viewNumber}`);
-                    var context = canvas.getContext('2d');
+            const canvas = document.getElementById(`pdf-canvas-${viewNumber}`);
+            var context = canvas.getContext('2d');
+
+            function renderPage(num) {
+                pdfDoc.getPage(num).then(function (page) {
+                    const viewport = page.getViewport({ scale: scale });
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
 
-                    var renderContext = {
+                    const renderContext = {
                         canvasContext: context,
                         viewport: viewport
                     };
-                    page.render(renderContext);
+                    page.render(renderContext).promise.then(function () {              
+                    });
                 });
+            }
+
+            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+                // TODO fix the page system, the one Antonin converted are wrong and need pageNumber+1
+                pdfDoc = pdfDoc_;
+                pageCount = pdfDoc.numPages;
+                renderPage(pageNum)
             }, function(reason) {
                 console.error(reason);
             });
+
+            function queueRenderPage(num) {
+                if (num <= pageCount && num >= 1) {
+                    pageNum = num;
+                    renderPage(pageNum);
+                }
+            }
+
+            const prevPageBtn = document.getElementById(`prev-page-${viewNumber}`);
+            if (prevPageBtn) {
+                prevPageBtn.addEventListener('click', () => {
+                    if (pageNum <= 1) return;
+                    queueRenderPage(pageNum - 1);
+                });
+            }
+
+            const nextPageBtn = document.getElementById(`next-page-${viewNumber}`);
+            if (nextPageBtn) {
+                nextPageBtn.addEventListener('click', () => {
+                    if (pageNum >= pageCount) return;
+                    queueRenderPage(pageNum + 1);
+                });
+            }
+
+            const zoomInBtn = document.getElementById(`zoom-in-${viewNumber}`);
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                    scale += 0.1;
+                    renderPage(pageNum);
+                });
+            }
+
+            const zoomOutBtn = document.getElementById(`zoom-out-${viewNumber}`);
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                    if (scale <= 0.2) return;
+                    scale -= 0.1;
+                    renderPage(pageNum);
+                });
+            }
         }
     }
 
@@ -382,15 +435,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
             for (let i = 0; i < newDocs; i++) {
-                console.log(data.metadatas[i]);
                 addContextElement(data.context[i].replace(/\n/g, "<br>"), data.metadatas[i], storedChunks + i + 1);
             }
 
             waitForNewContextElementsToLoad(newDocs, storedChunks, () => {
+                setupContextCollapseEvents(newDocs, storedChunks);
+                setupCloseEventListener(newDocs, storedChunks);
+                setupViewEventListener(newDocs, storedChunks);
                 storedChunks += newDocs
-                setupContextCollapseEvents(storedChunks);
-                setupCloseEventListener(storedChunks);
-                setupViewEventListener(storedChunks);
             });
         });
         chatInput.value = "";
@@ -514,7 +566,6 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     async function addContextElement(context, metadatas, contextNumber) {
         let fileName = metadatas["file_name"];
-        console.log(fileName);
 
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';
@@ -526,12 +577,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const cardFooter = document.createElement('div');
         cardFooter.className = 'card-footer text-white';
 
-        const closeButton = document.createElement('btn');
+        const closeButton = document.createElement('button');
         const closeIcon = document.createElement('img');
         closeIcon.classList.add('icon');
         closeIcon.classList.add('download-icon');
         closeIcon.src = `${root}/static/img/cancel.svg`;
         closeButton.id = `close${contextNumber}`;
+        closeButton.className = 'btn-ctx-nav';
         closeButton.appendChild(closeIcon);
 
         const pdfdiv = document.createElement('div');
@@ -541,37 +593,94 @@ document.addEventListener("DOMContentLoaded", function() {
         canva.id = `pdf-canvas-${contextNumber}`;
 
         const doc = await getDocument(fileName);
-        console.log(fileName);
         if (doc) {
-            console.log(doc.name);
             const docIcon = createIcon(doc);
             span.appendChild(docIcon);
             span.appendChild(document.createTextNode(fileName));
 
-            const downloadButton = createLink(doc);
-            downloadButton.textContent = "";
+            const downloadButton = document.createElement('button');
+            downloadButton.className = 'btn-ctx-nav';
+            const downloadLink = createLink(doc);
+            downloadLink.textContent = "";
 
             const downloadIcon = document.createElement('img');
             downloadIcon.classList.add('icon');
             downloadIcon.classList.add('download-icon');
             downloadIcon.src = `${root}/static/img/download.svg`;
     
-            downloadButton.appendChild(downloadIcon);
+            downloadLink.appendChild(downloadIcon);
+            downloadButton.appendChild(downloadLink);
             cardHeader.appendChild(downloadButton);
 
             cardFooter.appendChild(downloadButton);
             if(doc.extension.toLowerCase() === 'pdf'){
-                const viewButton = document.createElement('btn');
+                const viewButton = document.createElement('button');
                 const viewIcon = document.createElement('img');
                 viewIcon.classList.add('icon');
                 viewIcon.classList.add('download-icon');
                 viewIcon.src = `${root}/static/img/view.svg`;
                 viewButton.id = `view${contextNumber}`;
+                viewButton.className = 'btn-ctx-nav';
                 viewButton.setAttribute('data-document-name', fileName);
                 viewButton.setAttribute('data-page-number', metadatas["page"]);
 
                 viewButton.appendChild(viewIcon);
                 cardFooter.appendChild(viewButton);
+
+                const pdfBtnDiv = document.createElement('div');
+                pdfBtnDiv.className = 'pdf-buttons-container';
+                const changePageBtnDiv = document.createElement('div');
+                changePageBtnDiv.className = 'page-buttons-container';
+                const zoomBtnDiv = document.createElement('div');
+                zoomBtnDiv.className = 'zoom-buttons-container';
+
+                const prevButton = document.createElement('button');
+                const prevIcon = document.createElement('img');
+                prevIcon.className = 'icon-pdf';
+                prevIcon.src = `${root}/static/img/square-arrow-left.svg`;
+                prevButton.id = `prev-page-${contextNumber}`;
+                prevButton.className = 'btn';
+                prevButton.appendChild(prevIcon);
+
+                const nextButton = document.createElement('button');
+                const nextIcon = document.createElement('img');
+                nextIcon.className = 'icon-pdf';
+                nextIcon.src = `${root}/static/img/square-arrow-right.svg`;
+                nextButton.id = `next-page-${contextNumber}`;
+                nextButton.className = 'btn';
+                nextButton.appendChild(nextIcon);
+
+                const zoomOutButton = document.createElement('button');
+                const zoomOutIcon = document.createElement('img');
+                zoomOutIcon.className = 'icon-pdf';
+                zoomOutIcon.src = `${root}/static/img/search-minus.svg`;
+                zoomOutButton.id = `zoom-out-${contextNumber}`;
+                zoomOutButton.className = 'btn';
+                zoomOutButton.appendChild(zoomOutIcon);
+
+                const zoomInButton = document.createElement('button');
+                const zoomInIcon = document.createElement('img');
+                zoomInIcon.className = 'icon-pdf';
+                zoomInIcon.src = `${root}/static/img/search-add.svg`;
+                zoomInButton.id = `zoom-in-${contextNumber}`;
+                zoomInButton.className = 'btn';
+                zoomInButton.appendChild(zoomInIcon);
+
+                const fullscreenButton = document.createElement('button');
+                fullscreenButton.textContent = 'Full screen';
+                fullscreenButton.id = `fullscreen-${contextNumber}`;
+                fullscreenButton.className = 'btn';
+
+                // Append buttons to cardFooter
+                cardFooter.appendChild(viewButton);
+                changePageBtnDiv.appendChild(prevButton);
+                changePageBtnDiv.appendChild(nextButton);
+                zoomBtnDiv.appendChild(zoomInButton);
+                zoomBtnDiv.appendChild(zoomOutButton);
+                //cardFooter.appendChild(fullscreenButton);
+                pdfBtnDiv.appendChild(changePageBtnDiv);
+                pdfBtnDiv.appendChild(zoomBtnDiv);
+                pdfdiv.appendChild(pdfBtnDiv);
             }           
             cardFooter.appendChild(closeButton);
 
@@ -664,7 +773,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /**
      * Waits for all context elements to load before executing a callback.
-     * @param {number} numberOfDocuments - The number of context documents to wait for.
+     * @param {number} newDocs - The number of new context documents to wait for.
+     * @param {number} numberOfDocumentsBefore - Previous number of documents.
      * @param {Function} callback - The callback function to execute after elements are loaded.
      */
     function waitForNewContextElementsToLoad(newDocs, numberOfDocumentsBefore, callback) {

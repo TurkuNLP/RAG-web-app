@@ -1,11 +1,10 @@
+@import url('variables.css');
+
 /* Right Sidebar and Context Retriever Specific Styles */
 .sidebar-right {
   width: 35vw !important;
   right: 0;
   z-index: 1;
-}
-.sidebar-right .icon{
-  filter: var(--white-svg);
 }
 
 /* Closed State Styles */
@@ -49,23 +48,23 @@
   transform: rotate(180deg);
 }
 .sidebar-right .nav-body .card-header.collapse-open {
-  background-color: #5b72d6;
+  background-color: var(--primary-color-light);
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
 }
 .sidebar-right .nav-body .card-header.search-card:hover {
-  background-color: #455dc7;
+  background-color: var(--primary-color);
   border-radius: 1rem;
 }
 .sidebar-right .nav-body .card-header.collapse-open:hover {
-  background-color: #5b72d6;
+  background-color: var(--primary-color-light);
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 .sidebar-right .nav-body .card-body {
-  background-color: #5b72d6;
+  background-color: var(--primary-color-light);
   position: relative;
   padding: 1rem 2rem;
   border-bottom-left-radius: 1rem;
@@ -75,11 +74,11 @@
 
 /* Context Retriever Styles */
 .sidebar-right .context-retriever .card {
-  background-color: #455dc7;
+  background-color: var(--primary-color);
   border: none;
 }
 .sidebar-right .context-retriever .card-header {
-  background-color: #455dc7;
+  background-color: var(--primary-color);
   border: none;
   display: inline-flex;
   align-items: center;
@@ -97,7 +96,7 @@
   margin-top: 0;
 }*/
 .sidebar-right .context-retriever .card-header:hover {
-  background-color: #5b72d6;
+  background-color: var(--primary-color-light);
   border-radius: 1rem;
 }
 .sidebar-right .context-retriever .btn {
@@ -128,12 +127,15 @@
   padding-top: 0.5rem;
 }
 
+/* PDF display and buttons */
+
 .pdf-viewer {
   max-height: 400px;
   overflow: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--white);
   border-radius: 1rem;
   margin-top: 0.5rem;
+  background-color: var(--white);
 }
 .pdf-viewer.hide{
   display: none;
@@ -141,4 +143,32 @@
 canvas {
   display: block;
   margin: auto;
+}
+.pdf-buttons-container{
+  display: flex;
+  justify-content: space-between;
+}
+.page-buttons-container,
+.zoom-buttons-container {
+  display: flex;
+  align-items: center;
+}
+.icon-pdf{
+  filter: var(--primary-color-light-svg);
+}
+.sidebar-right .context-retriever .btn-ctx-nav{
+  padding: 0;
+  border: 0.5rem solid transparent;
+  background-color: var(--primary-color-light);
+  border-radius: 1rem;
+}
+.sidebar-right .context-retriever .btn-ctx-nav .icon {
+  filter: var(--white-svg);
+}
+.sidebar-right .context-retriever .btn-ctx-nav:hover .icon{
+  filter: var(--primary-color-light-svg);
+}
+.sidebar-right .context-retriever .btn-ctx-nav:hover{
+  background-color: var(--white);
+  transition: background-color 0.5s ease-in-out;
 }

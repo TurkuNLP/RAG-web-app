@@ -1,3 +1,5 @@
+@import url('variables.css');
+
 /* Left Sidebar Specific Styles */
 .sidebar-left {
   max-width: 25rem !important;
