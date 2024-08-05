@@ -66,8 +66,8 @@
                                     </div>
                                     <div class="slider-container">
                                         <span id="minValue">1</span>
-                                        <input type="range" class="form-range" id="similaritySlider" min="1" max="30" step="1">
-                                        <span id="maxValue">30</span>
+                                        <input type="range" class="form-range" id="similaritySlider" min="1" max="50" step="1">
+                                        <span id="maxValue">50</span>
                                     </div>
                                 </div>
                                 
@@ -85,8 +85,8 @@
                                     </div>
                                     <div class="slider-container">
                                         <span id="minValue">1</span>
-                                        <input type="range" class="form-range" id="maxChunkSlider" min="1" max="30" step="1">
-                                        <span id="maxValue">30</span>
+                                        <input type="range" class="form-range" id="maxChunkSlider" min="1" max="50" step="1">
+                                        <span id="maxValue">50</span>
                                     </div>
                                 </div>
 
@@ -96,24 +96,24 @@
                                     </div>
                                     <div class="slider-container">
                                         <span id="minValue">1</span>
-                                        <input type="range" class="form-range" id="consideredChunkSlider" min="1" max="30" step="1">
-                                        <span id="maxValue">30</span>
+                                        <input type="range" class="form-range" id="consideredChunkSlider" min="1" max="50" step="1">
+                                        <span id="maxValue">50</span>
                                     </div>
                                     <div class="slider-value">
                                         <img src="{{ root }}/static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Define the amount of document to return">Retrieved chunks: <span id="retrievedChunkSliderValue">1</span>
                                     </div>
                                     <div class="slider-container">
                                         <span id="minValue">1</span>
-                                        <input type="range" class="form-range" id="retrievedChunkSlider" min="1" max="30" step="1">
-                                        <span id="maxValue">30</span>
+                                        <input type="range" class="form-range" id="retrievedChunkSlider" min="1" max="50" step="1">
+                                        <span id="maxValue">50</span>
                                     </div>
                                     <div class="slider-value">
-                                        <img src="{{ root }}/static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Diversity of results returned by MMR<br>100% for minimum diversity and 0% for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>%
+                                        <img src="{{ root }}/static/img/information-circle.svg" alt="Info" class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="right" title="Diversity of results returned by MMR<br>100% for minimum diversity and 0% for maximum<br>Useful if your dataset has many similar documents">Lambda multiplicator: <span id="lambdaSliderValue">1</span>
                                     </div>
                                     <div class="slider-container">
-                                        <span id="minValue">0%</span>
-                                        <input type="range" class="form-range" id="lambdaSlider" min="0" max="100" step="1">
-                                        <span id="maxValue">100%</span>
+                                        <span id="minValue">0</span>
+                                        <input type="range" class="form-range" id="lambdaSlider" min="0" max="1" step="0.01">
+                                        <span id="maxValue">1</span>
                                     </div>
                                 </div>
                             </li>

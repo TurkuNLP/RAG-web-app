@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
      * Initializes the main settings and elements when the page is loaded.
      */
     function init() {
-        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 25, 'openai', 'gpt-3.5-turbo');
+        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 0.5, 'openai', 'gpt-3.5-turbo');
         clearChatHistory(true);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
@@ -59,6 +59,17 @@ document.addEventListener("DOMContentLoaded", function() {
         leftSidebarEvents();
         loadDocuments();
         hideOverlay();
+    }
+
+    /**
+     * Delays execution of other functions
+     */
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
     }
 
     /**
@@ -177,41 +188,46 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateSettings() {
         similaritySlider.addEventListener('input', function() {
             similaritySliderValue.textContent = this.value;
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         similarityScoreSlider.addEventListener('input', function() {
             similarityScoreSliderValue.textContent = this.value;
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         maxChunkSlider.addEventListener('input', function() {
             maxChunkSliderValue.textContent = maxChunkSlider.value;
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         consideredChunkSlider.addEventListener('input', function() {
             consideredChunkSliderValue.textContent = this.value;
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         retrievedChunkSlider.addEventListener('input', function() {
             retrievedChunkSliderValue.textContent = this.value;
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         lambdaSlider.addEventListener('input', function() {
             lambdaSliderValue.textContent = this.value;
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         searchTypeDropdown.addEventListener('change', function() {
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         embeddingModelDropdown.addEventListener('change', function() {
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         llmModelDropdown.addEventListener('change', function() {
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
         historySwitchBtn.addEventListener('change', function() {
-            submitSettingsToServer();
+            debounceSubmitSettingsToServer();
         });
     }
+
+    /**
+     * Delayed version of submitSettingsToServer() sending settings only when user stops the sliders
+     */
+    const debounceSubmitSettingsToServer = debounce(submitSettingsToServer, 300);
 
     /**
      * Submits the updated settings to the server.
@@ -226,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
             max_chunk_return: parseInt(maxChunkSlider.value, 10),
             considered_chunk: parseInt(consideredChunkSlider.value, 10),
             mmr_doc_nb: parseInt(retrievedChunkSlider.value, 10),
-            lambda_mult: parseInt(lambdaSlider.value, 10) / 100,
+            lambda_mult: parseFloat(lambdaSlider.value).toFixed(2),
             isHistoryOn : historySwitchBtn.checked
         };
         fetch(`${root}/update-settings`, {
