@@ -51,12 +51,9 @@ def process_directory(input_dir, output_dir):
             extract_and_save_segments(docx_path, output_dir)
 
 # Spécifiez les chemins du répertoire d'entrée et de sortie
-input_dir = "russian_data_english_docx"
-output_dir = "russian_data_english_pdf"
+input_dir = "/home/mtebad/projects/RAG-web-app/data/EN"
+output_dir = "/home/mtebad/projects/RAG-web-app/data/"
 # Traiter tous les fichiers .docx dans le répertoire d'entrée
 process_directory(input_dir, output_dir)
-
-print("Traitement terminé avec succès.")
-
 
 
