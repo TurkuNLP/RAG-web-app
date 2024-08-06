@@ -50,7 +50,7 @@ def get_rag_chain(params = None):
         "max_chunk_return": 5,
         "considered_chunk": 25,
         "mmr_doc_nb": 5,
-        "lambda_mult":0.25,
+        "lambda_mult":0.5,
         "isHistoryOn": True,
     }
     if params is None :

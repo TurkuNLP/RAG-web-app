@@ -11,4 +11,8 @@
     --background-color: rgba(0, 0, 0, 0.5);
     --light-grey: rgb(221, 221, 221);
     --grey: rgb(176, 176, 176);
+    --dark-grey: #343a40;
+    --transparent-light-grey: #ffffff94;
+    --transparent-dark-grey: #ffffff3a;
+    --shadeoverlay: #5b71d600;
   }

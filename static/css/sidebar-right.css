@@ -13,7 +13,7 @@
 }
 .right-sidebar-closed .sidebar-right #sidebarToggleHolder {
   position: absolute !important;
-  color: #858791 !important;
+  color: var(--grey) !important;
   right: 0;
   top: 0;
   padding: 1.5rem;

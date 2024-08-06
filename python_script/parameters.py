@@ -34,7 +34,6 @@ def load_config(config_name = 'default', show_config = False):
         "chroma_root_path": "", # Path to the folder where the Chroma database will be stored
         "embedding_model": "",  # Model to use for embeddings (e.g., 'sentence-transformers/all-mpnet-base-v2', 'openai', 'voyage-law-2')
         "llm_model": "",        # Model to use for the language model (e.g., 'gpt-3.5-turbo', 'mistralai/Mistral-7B-Instruct-v0.1', 'nvidia/Llama3-ChatQA-1.5-8B')
-        "prompt_template": ""   # Template for the prompt
       }
     }
     

@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
             max_chunk_return: parseInt(maxChunkSlider.value, 10),
             considered_chunk: parseInt(consideredChunkSlider.value, 10),
             mmr_doc_nb: parseInt(retrievedChunkSlider.value, 10),
-            lambda_mult: parseFloat(lambdaSlider.value).toFixed(2),
+            lambda_mult: parseInt(100 * parseFloat(lambdaSlider.value).toFixed(2), 10) / 100, //parseFloat(lambdaSlider.value).toFixed(2) introduced an error with float type in python. That is the way I made it work....
             isHistoryOn : historySwitchBtn.checked
         };
         fetch(`${root}/update-settings`, {
@@ -336,6 +336,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 const viewContainer = document.getElementById(`pdf-${docNum}`);
                 viewButton.addEventListener('click', () => {
                     viewContainer.classList.toggle('hide');
+                    viewIcon = document.getElementById(`view_icon_${docNum}`)
+                    if (viewContainer.classList.contains('hide')) {
+                        viewIcon.src = `${root}/static/img/view.svg`;
+                    }
+                    else {
+                        viewIcon.src = `${root}/static/img/view-off.svg`;
+                    }
                 });
             }
         }
@@ -382,7 +389,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 });
             }
-
             pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
                 // TODO fix the page system, the one Antonin converted are wrong and need pageNumber+1
                 pdfDoc = pdfDoc_;
@@ -640,10 +646,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 viewIcon.classList.add('icon');
                 viewIcon.classList.add('download-icon');
                 viewIcon.src = `${root}/static/img/view.svg`;
+                viewIcon.id = `view_icon_${contextNumber}`
                 viewButton.id = `view${contextNumber}`;
                 viewButton.className = 'btn-ctx-nav';
                 viewButton.setAttribute('data-document-name', fileName);
-                viewButton.setAttribute('data-page-number', metadatas["page"]);
+                viewButton.setAttribute('data-page-number', metadatas["page_counter"]);
 
                 viewButton.appendChild(viewIcon);
                 cardFooter.appendChild(viewButton);
