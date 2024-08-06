@@ -14,5 +14,3 @@ data/
 node_modules/
 *.log
 *.pyc
-python_script/cleanpdf.py
-python_script/docxtopdf.py

@@ -75,18 +75,18 @@ def load_documents():
         llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
         for doc in tqdm(llama_document_loader.load_data(), desc="TXT/DOCX loaded"):
             doc.metadata.pop('file_path',None)
-            print(doc.metadata)
             llama_documents.append(doc)
     except ValueError as e:
         print(e)
 
     langchain_document_loader = ProgressPyPDFDirectoryLoader(DATA_PATH)
     for doc in tqdm(langchain_document_loader.load(), desc="PDFs loaded"):
+        doc.metadata.pop('file_path',None)
         print(doc.metadata)
         langchain_documents.append(doc)
 
     documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
-    print(f"Loaded {len(langchain_documents)} chunks from PDF documents, {len(llama_documents)} chunks from TXT/DOCX documents.\nTotal chunks: {len(documents)}.\n")
+    print(f"Loaded {len(langchain_documents)} page{'s' if len(langchain_documents) > 1 else ''} from PDF document{'s' if len(langchain_documents) > 1 else ''}, {len(llama_documents)} item{'s' if len(llama_documents) > 1 else ''} from TXT/DOCX document{'s' if len(llama_documents) > 1 else ''}.\nTotal items: {len(documents)}.\n")
     return documents
 
 def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
@@ -130,14 +130,14 @@ def add_to_chroma(chunks: list[Document]):
     # Add or Update the documents.
     existing_items = db.get(include=[])
     existing_ids = set(existing_items["ids"])
-    print(f"Number of existing documents in DB: {len(existing_ids)}")
+    print(f"Number of existing chunks in DB: {len(existing_ids)}")
 
     # Only add documents that don't exist in the DB.
     new_chunks = [chunk for chunk in chunks_with_ids if chunk.metadata["id"] not in existing_ids]
     batch_size = 1000
 
     if new_chunks:
-        with tqdm(total=len(new_chunks), desc="Adding documents") as pbar:
+        with tqdm(total=len(new_chunks), desc="Adding chunks") as pbar:
             for i in range(0,len(new_chunks), batch_size):
                 batch = new_chunks[i:i + batch_size]
                 new_chunk_ids = [chunk.metadata["id"] for chunk in batch]
@@ -146,7 +146,7 @@ def add_to_chroma(chunks: list[Document]):
                 pbar.update(len(batch))
 
     else:
-        print("Done. No new documents to add")
+        print("Done. No new chunks to add")
 
 
 def calculate_chunk_ids(chunks):
@@ -235,12 +235,14 @@ class ProgressPyPDFDirectoryLoader(PyPDFDirectoryLoader):
                         try:
                             loader = PDFPlumberLoader(str(i), extract_images=self.extract_images)
                             sub_docs = loader.load()
+                            page_counter = 1
                             for doc in sub_docs:
                                 if 'source' in doc.metadata:
                                     doc.metadata['source'] = i.name
                                     doc.metadata['file_name'] = doc.metadata.pop('source')
-                                #doc.metadata.pop('file_path',None)
                                 doc.metadata = {key: value for key, value in doc.metadata.items() if value}
+                                doc.metadata['page_counter'] = page_counter
+                                page_counter += 1
                             docs.extend(sub_docs)
                         except Exception as e:
                             if self.silent_errors:
