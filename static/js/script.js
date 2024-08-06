@@ -651,7 +651,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 viewButton.className = 'btn-ctx-nav';
                 viewButton.setAttribute('data-document-name', fileName);
                 viewButton.setAttribute('data-page-number', metadatas["page_counter"]);
-
                 viewButton.appendChild(viewIcon);
                 cardFooter.appendChild(viewButton);
 

@@ -1,0 +1,9 @@
+---
+documentclass: article
+fontsize: 12pt
+mainfont: DejaVu Sans
+lang: ru-RU
+papersize: a4
+geometry: margin=1in
+---
+
