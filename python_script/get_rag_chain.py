@@ -1,14 +1,16 @@
-from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL
+from parameters import DATABASE_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL
 
 from get_embedding_function import get_embedding_function
 from get_llm_function import get_llm_function
-from populate_database import find_chroma_path
+from populate_database import find_database_path
 
 from langchain.vectorstores.chroma import Chroma
 from langchain.chains import create_history_aware_retriever
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+import faiss                  
 
 def get_rag_chain(params = None):
     """
@@ -41,7 +43,7 @@ def get_rag_chain(params = None):
     """
     
     default_params = {
-        "chroma_root_path": CHROMA_ROOT_PATH,
+        "chroma_root_path": DATABASE_ROOT_PATH,
         "embedding_model": EMBEDDING_MODEL,
         "llm_model": LLM_MODEL,
         "search_type": "similarity",
@@ -66,7 +68,7 @@ def get_rag_chain(params = None):
         
         embedding_model = get_embedding_function(model_name=params["embedding_model"])
         llm = get_llm_function(model_name=params["llm_model"])
-        db = Chroma(persist_directory=find_chroma_path(model_name=params["embedding_model"], base_path=params["chroma_root_path"]), embedding_function=embedding_model)
+        db = Chroma(persist_directory=find_database_path(model_name=params["embedding_model"], base_path=params["chroma_root_path"]), embedding_function=embedding_model)
         
         search_type = params["search_type"]
         if search_type == "similarity":
