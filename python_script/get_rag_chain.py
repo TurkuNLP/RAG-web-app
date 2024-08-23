@@ -11,6 +11,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 import faiss                  
+import numpy as np
 
 def get_rag_chain(params = None):
     """
@@ -69,7 +70,23 @@ def get_rag_chain(params = None):
         embedding_model = get_embedding_function(model_name=params["embedding_model"])
         llm = get_llm_function(model_name=params["llm_model"])
         db = Chroma(persist_directory=find_database_path(model_name=params["embedding_model"], base_path=params["chroma_root_path"]), embedding_function=embedding_model)
-        
+        """
+        import faiss
+        import numpy as np
+
+        # Load the FAISS index from disk
+        index = faiss.read_index('faiss_index.bin')
+
+        vector_store = FAISS(
+            embedding_function=OpenAIEmbeddings(),
+            index=index,
+            docstore= InMemoryDocstore(),
+            index_to_docstore_id={}
+        )
+        results = vector_store.similarity_search(query="thud",k=1)
+
+
+        """
         search_type = params["search_type"]
         if search_type == "similarity":
             retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["similarity_doc_nb"]})

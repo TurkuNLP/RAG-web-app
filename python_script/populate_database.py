@@ -16,6 +16,7 @@ from get_embedding_function import get_embedding_function
 from langchain.vectorstores.chroma import Chroma
 import faiss
 from langchain_community.vectorstores import FAISS
+import numpy as np
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -51,6 +52,17 @@ def main():
         documents = load_documents()
         chunks = split_documents(documents)
         add_to_database(chunks)
+        #create_faiss_index()
+
+def create_faiss_index():
+    chroma_db = Chroma(persist_directory=find_database_path(model_name=LLM_MODEL, base_path=DATABASE_ROOT_PATH), embedding_function=EMBEDDING_MODEL)
+    embeddings = chroma_db.get_embeddings()
+    dim = len(embeddings[0])  
+    index = faiss.IndexFlatL2(dim) 
+    embeddings_np = np.array(embeddings, dtype=np.float32)
+    index.add(embeddings_np)
+    faiss.write_index(index, 'faiss_index.bin')
+
 
 def load_config(config_name):
     """
