@@ -3,26 +3,30 @@ import os
 import shutil
 
 from tqdm import tqdm
+import faiss
+from typing import List
+from pathlib import Path
+import logging
+
+from get_embedding_function import get_embedding_function
 
 from langchain.schema.document import Document
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain.document_loaders.pdf import PDFPlumberLoader
-from typing import List
-from pathlib import Path
-import logging
 from llama_index.core import SimpleDirectoryReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from get_embedding_function import get_embedding_function
-from langchain.vectorstores.chroma import Chroma
-import faiss
 from langchain_community.vectorstores import FAISS
-import numpy as np
+from langchain_community.docstore.in_memory import InMemoryDocstore
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 def main():
-    parser = argparse.ArgumentParser(description="This script manages the database for the application. You can use it to clear the database, reset it, or populate it with a specific configuration that can be specified in the config.json file.")
+    parser = argparse.ArgumentParser(description="""This script manages the database for the application.
+                                    You can use it to clear the database, reset it, or populate 
+                                    it with a specific configuration that can be specified in the
+                                    config.json file.""")
     parser.add_argument("--config", type=str, help="Enter the name of the config you want to populate your database.")
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     parser.add_argument("--clear", action="store_true", help="Clear the database.")
@@ -52,17 +56,44 @@ def main():
         documents = load_documents()
         chunks = split_documents(documents)
         add_to_database(chunks)
-        #create_faiss_index()
 
-def create_faiss_index():
-    chroma_db = Chroma(persist_directory=find_database_path(model_name=LLM_MODEL, base_path=DATABASE_ROOT_PATH), embedding_function=EMBEDDING_MODEL)
-    embeddings = chroma_db.get_embeddings()
-    dim = len(embeddings[0])  
-    index = faiss.IndexFlatL2(dim) 
-    embeddings_np = np.array(embeddings, dtype=np.float32)
-    index.add(embeddings_np)
-    faiss.write_index(index, 'faiss_index.bin')
+def add_to_database(chunks: list[Document]):
 
+    # Assume all valid embeddings have the same dimension
+    index = faiss.IndexFlatL2(len(get_embedding_function(EMBEDDING_MODEL).embed_query("hello world")))
+
+    vector_store = FAISS(
+        embedding_function=get_embedding_function(EMBEDDING_MODEL),
+        index=index,
+        docstore= InMemoryDocstore(),
+        index_to_docstore_id={}
+    )
+    existing_ids = []
+    
+    index_file = find_database_path(EMBEDDING_MODEL,DATABASE_ROOT_PATH) + "index.faiss"
+    if os.path.exists(index_file):
+        vector_store = FAISS.load_local(find_database_path(EMBEDDING_MODEL,DATABASE_ROOT_PATH),
+                                        get_embedding_function(EMBEDDING_MODEL), 
+                                        allow_dangerous_deserialization=True)
+        # Add or Update the documents.
+        existing_ids = vector_store.index_to_docstore_id.values()
+        print("existing_ids", vector_store.index_to_docstore_id.values())
+
+    chunks_with_ids = calculate_chunk_ids(chunks)
+
+    # Only add documents that don't exist in the DB.
+    new_chunks = [chunk for chunk in chunks_with_ids if chunk.metadata["id"] not in existing_ids]
+    batch_size = 1000
+
+    if new_chunks:
+        with tqdm(total=len(new_chunks), desc="Adding chunks") as pbar:
+            for i in range(0,len(new_chunks), batch_size):
+                batch = new_chunks[i:i + batch_size]
+                new_chunk_ids = [chunk.metadata["id"] for chunk in batch]
+                vector_store.add_documents(batch, ids=new_chunk_ids)
+                pbar.update(len(batch))
+    
+    vector_store.save_local(find_database_path(EMBEDDING_MODEL,DATABASE_ROOT_PATH))
 
 def load_config(config_name):
     """
@@ -97,11 +128,12 @@ def load_documents():
     langchain_document_loader = ProgressPyPDFDirectoryLoader(DATA_PATH)
     for doc in tqdm(langchain_document_loader.load(), desc="PDFs loaded"):
         doc.metadata.pop('file_path',None)
-        print(doc.metadata)
         langchain_documents.append(doc)
 
     documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
-    print(f"Loaded {len(langchain_documents)} page{'s' if len(langchain_documents) > 1 else ''} from PDF document{'s' if len(langchain_documents) > 1 else ''}, {len(llama_documents)} item{'s' if len(llama_documents) > 1 else ''} from TXT/DOCX document{'s' if len(llama_documents) > 1 else ''}.\nTotal items: {len(documents)}.\n")
+    print(f"Loaded {len(langchain_documents)} page{'s' if len(langchain_documents) > 1 else ''} from PDF document{ \
+        's' if len(langchain_documents) > 1 else ''}, {len(llama_documents)} item{'s' \
+            if len(llama_documents) > 1 else ''} from TXT/DOCX document{'s' if len(llama_documents) > 1 else ''}.\nTotal items: {len(documents)}.\n")
     return documents
 
 def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
@@ -124,42 +156,6 @@ def split_documents(documents: list[Document]):
         is_separator_regex=False,
     )
     return text_splitter.split_documents(documents)
-
-
-def add_to_database(chunks: list[Document]):
-    """
-    Load the database
-    Check if there are new documents in the documents database
-    Add them to the database
-    """
-    # Load the existing database.
-    db = Chroma(
-        persist_directory=find_database_path(EMBEDDING_MODEL,DATABASE_ROOT_PATH), embedding_function=get_embedding_function(EMBEDDING_MODEL)
-    )
-
-    chunks_with_ids = calculate_chunk_ids(chunks)
-
-    # Add or Update the documents.
-    existing_items = db.get(include=[])
-    existing_ids = set(existing_items["ids"])
-    print(f"Number of existing chunks in DB: {len(existing_ids)}")
-
-    # Only add documents that don't exist in the DB.
-    new_chunks = [chunk for chunk in chunks_with_ids if chunk.metadata["id"] not in existing_ids]
-    batch_size = 1000
-
-    if new_chunks:
-        with tqdm(total=len(new_chunks), desc="Adding chunks") as pbar:
-            for i in range(0,len(new_chunks), batch_size):
-                batch = new_chunks[i:i + batch_size]
-                new_chunk_ids = [chunk.metadata["id"] for chunk in batch]
-                db.add_documents(batch, ids=new_chunk_ids)
-                db.persist()
-                pbar.update(len(batch))
-
-    else:
-        print("Done. No new chunks to add")
-
 
 def calculate_chunk_ids(chunks):
     """

@@ -4,14 +4,11 @@ from get_embedding_function import get_embedding_function
 from get_llm_function import get_llm_function
 from populate_database import find_database_path
 
-from langchain.vectorstores.chroma import Chroma
 from langchain.chains import create_history_aware_retriever
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
-import faiss                  
-import numpy as np
+from langchain_community.vectorstores import FAISS
 
 def get_rag_chain(params = None):
     """
@@ -24,7 +21,7 @@ def get_rag_chain(params = None):
 
     Parameters:
         params (dict, optional): A dictionary of configuration parameters.
-            - chroma_root_path (str): The root path for Chroma data storage.
+            - database_root_path (str): The root path for data storage.
             - embedding_model (str): The model name for the embedding function.
             - llm_model (str): The model name for the language model.
             - search_type (str): The type of search to perform. Options are:
@@ -44,7 +41,7 @@ def get_rag_chain(params = None):
     """
     
     default_params = {
-        "chroma_root_path": DATABASE_ROOT_PATH,
+        "database_root_path": DATABASE_ROOT_PATH,
         "embedding_model": EMBEDDING_MODEL,
         "llm_model": LLM_MODEL,
         "search_type": "similarity",
@@ -62,41 +59,34 @@ def get_rag_chain(params = None):
         params = {**default_params, **params}
 
     try:
-        required_keys = ["chroma_root_path", "embedding_model", "llm_model"]
+        required_keys = ["database_root_path", "embedding_model", "llm_model"]
         for key in required_keys:
             if key not in params:
                 raise NameError(f"Required setting '{key}' not defined.")
         
         embedding_model = get_embedding_function(model_name=params["embedding_model"])
         llm = get_llm_function(model_name=params["llm_model"])
-        db = Chroma(persist_directory=find_database_path(model_name=params["embedding_model"], base_path=params["chroma_root_path"]), embedding_function=embedding_model)
-        """
-        import faiss
-        import numpy as np
 
         # Load the FAISS index from disk
-        index = faiss.read_index('faiss_index.bin')
+        vector_store = FAISS.load_local(find_database_path(EMBEDDING_MODEL,DATABASE_ROOT_PATH)
+                                        , embedding_model, allow_dangerous_deserialization=True)
 
-        vector_store = FAISS(
-            embedding_function=OpenAIEmbeddings(),
-            index=index,
-            docstore= InMemoryDocstore(),
-            index_to_docstore_id={}
-        )
-        results = vector_store.similarity_search(query="thud",k=1)
-
-
-        """
         search_type = params["search_type"]
         if search_type == "similarity":
-            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["similarity_doc_nb"]})
+            retriever = vector_store.as_retriever(search_type=search_type,
+                                                  search_kwargs={"k": params["similarity_doc_nb"]})
         elif search_type == "similarity_score_threshold":
-            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["max_chunk_return"],"score_threshold": params["score_threshold"]})
+            retriever = vector_store.as_retriever(search_type=search_type, 
+                                                  search_kwargs={"k": params["max_chunk_return"],
+                                                                 "score_threshold": params["score_threshold"]})
         elif search_type == "mmr":
-            retriever = db.as_retriever(search_type=search_type, search_kwargs={"k": params["mmr_doc_nb"], "fetch_k": params["considered_chunk"], "lambda_mult": params["lambda_mult"]})
+            retriever = vector_store.as_retriever(search_type=search_type, 
+                                                  search_kwargs={"k": params["mmr_doc_nb"], 
+                                                                 "fetch_k": params["considered_chunk"], 
+                                                                 "lambda_mult": params["lambda_mult"]})
         else:
             raise ValueError("Invalid 'search_type' setting")
-        
+
     except NameError as e:
         variable_name = str(e).split("'")[1]
         raise NameError(f"{variable_name} isn't defined")
@@ -137,5 +127,4 @@ def get_rag_chain(params = None):
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
 
     rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-
     return rag_chain
