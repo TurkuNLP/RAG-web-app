@@ -1,31 +1,31 @@
 {
     "default": {
         "data_path": "data/documents/default",
-        "chroma_root_path": "data/chroma/default",
+        "database_root_path": "data/database/default",
         "embedding_model": "voyage-law-2",
         "llm_model": "gpt-3.5-turbo"
     },
     "seus": {
       "data_path": "data/documents/ship_data",
-      "chroma_root_path": "data/chroma/ship_chroma",
+      "database_root_path": "data/database/ship",
       "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo"
     },
     "arch-en": {
       "data_path": "data/documents/arch_data-en",
-      "chroma_root_path": "data/chroma/arch_data-en_chroma",
+      "database_root_path": "data/database/arch_data-en",
       "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo"
     },
     "arch-ru": {
       "data_path": "data/documents/arch_data-ru",
-      "chroma_root_path": "data/chroma/arch_data-ru_chroma",
+      "database_root_path": "data/database/arch_data-ru",
       "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo"
     },
     "test": {
       "data_path": "data/documents/test_data",
-      "chroma_root_path": "data/chroma/test_chroma",
+      "database_root_path": "data/database/test",
       "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo"
     }

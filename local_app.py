@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'python_script'))
 from parameters import load_config
 global DATA_PATH
 load_config('test')
-from parameters import CHROMA_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE, DATA_PATH, REPHRASING_PROMPT, STANDALONE_PROMPT, ROUTER_DECISION_PROMPT
+from parameters import DATABASE_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE, DATA_PATH, REPHRASING_PROMPT, STANDALONE_PROMPT, ROUTER_DECISION_PROMPT
 from get_llm_function import get_llm_function
 from get_rag_chain import get_rag_chain
 from ConversationalRagChain import ConversationalRagChain
@@ -82,7 +82,6 @@ def get_Chat_response(query):
     "chat_history": []
     }
     res = rag_conv._call(inputs)
-    print(res['metadatas'])
     output = jsonify({
         'response': res['result'],
         'context': res['context'],
