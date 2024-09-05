@@ -28,6 +28,12 @@
       "database_root_path": "data/database/test",
       "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo"
+    },
+    "news": {
+      "data_path": "data/documents/news",
+      "database_root_path": "data/database/news",
+      "embedding_model": "openai",
+      "llm_model": "gpt-3.5-turbo"
     }
   }
   
