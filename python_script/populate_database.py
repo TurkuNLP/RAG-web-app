@@ -7,6 +7,7 @@ import faiss
 from typing import List
 from pathlib import Path
 import logging
+import re
 
 from get_embedding_function import get_embedding_function
 
@@ -77,7 +78,6 @@ def add_to_database(chunks: list[Document]):
                                         allow_dangerous_deserialization=True)
         # Add or Update the documents.
         existing_ids = vector_store.index_to_docstore_id.values()
-        print("existing_ids", vector_store.index_to_docstore_id.values())
 
     chunks_with_ids = calculate_chunk_ids(chunks)
 
@@ -85,14 +85,16 @@ def add_to_database(chunks: list[Document]):
     new_chunks = [chunk for chunk in chunks_with_ids if chunk.metadata["id"] not in existing_ids]
     batch_size = 1000
 
-    if new_chunks:
-        with tqdm(total=len(new_chunks), desc="Adding chunks") as pbar:
-            for i in range(0,len(new_chunks), batch_size):
-                batch = new_chunks[i:i + batch_size]
-                new_chunk_ids = [chunk.metadata["id"] for chunk in batch]
-                vector_store.add_documents(batch, ids=new_chunk_ids)
-                pbar.update(len(batch))
-    
+    try:
+        if new_chunks:
+            with tqdm(total=len(new_chunks), desc="Adding chunks") as pbar:
+                for i in range(0,len(new_chunks), batch_size):
+                    batch = new_chunks[i:i + batch_size]
+                    new_chunk_ids = [chunk.metadata["id"] for chunk in batch]
+                    vector_store.add_documents(batch, ids=new_chunk_ids)
+                    pbar.update(len(batch))
+    except ValueError as e:
+        print(e)
     vector_store.save_local(find_database_path(EMBEDDING_MODEL,DATABASE_ROOT_PATH))
 
 def load_config(config_name):
@@ -103,6 +105,10 @@ def load_config(config_name):
     from parameters import load_config as ld
     ld(config_name, show_config=True)
     from parameters import DATA_PATH, DATABASE_ROOT_PATH, EMBEDDING_MODEL, LLM_MODEL, PROMPT_TEMPLATE   
+
+def clean_text(text):
+    # Remove multiple newlines and replace multiple spaces with a single space
+    return re.sub(r'\s+', ' ', text).strip()
 
 def load_documents():
     """
@@ -118,8 +124,10 @@ def load_documents():
     llama_documents = []
 
     try:
-        llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".txt", ".docx"])
+        llama_document_loader = SimpleDirectoryReader(input_dir=DATA_PATH, required_exts=[".docx"]) #".txt", 
         for doc in tqdm(llama_document_loader.load_data(), desc="TXT/DOCX loaded"):
+            # Clean the text content of the document
+            doc.text = clean_text(doc.text)
             doc.metadata.pop('file_path',None)
             llama_documents.append(doc)
     except ValueError as e:
