@@ -585,6 +585,15 @@ document.addEventListener("DOMContentLoaded", function() {
         return chatLi;
     }
 
+    // Helper function to extract file name from 'source'
+    function extractFileNameFromSource(source) {
+        if (!source) {
+            return undefined;  // If 'source' is missing, return undefined
+        }
+        const pathParts = source.split('/');
+        return pathParts[pathParts.length - 1];  // Get the last part which is the file name
+    }
+
     /**
      * Creates and displays a new context element in the right sidebar.
      * @param {string} context - The context content.
@@ -592,7 +601,8 @@ document.addEventListener("DOMContentLoaded", function() {
      * @param {number} contextNumber - The numerical identifier for the context.
      */
     async function addContextElement(context, metadatas, contextNumber) {
-        let fileName = metadatas["file_name"];
+        
+        let fileName = metadatas?.file_name || extractFileNameFromSource(metadatas.source);
 
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';

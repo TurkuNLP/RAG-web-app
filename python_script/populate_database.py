@@ -2,7 +2,7 @@ import argparse
 import os
 import shutil
 
-import fitz
+#import fitz
 from tqdm import tqdm
 
 from langchain.schema.document import Document

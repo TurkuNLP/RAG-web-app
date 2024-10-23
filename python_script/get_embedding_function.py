@@ -23,9 +23,8 @@ def get_embedding_function(model_name = "voyage"):
         embeddings = VoyageAIEmbeddings(model="voyage-law-2")
 
     elif model_name == "voyage-multilingual-2":
-        print("/!\ WARNING /!\ \n")
-        print("Out of free token for this model chose another one")
-        return
+        #print("/!\ WARNING /!\ \n")
+        #print("Out of free token for this model chose another one")
         from langchain_voyageai import VoyageAIEmbeddings
         embeddings = VoyageAIEmbeddings(model="voyage-multilingual-2")        
         
