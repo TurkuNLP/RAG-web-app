@@ -603,6 +603,7 @@ document.addEventListener("DOMContentLoaded", function() {
     async function addContextElement(context, metadatas, contextNumber) {
         
         let fileName = metadatas?.file_name || extractFileNameFromSource(metadatas.source);
+        let page_number = metadatas?.page_counter || metadatas.page
 
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';
@@ -660,7 +661,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 viewButton.id = `view${contextNumber}`;
                 viewButton.className = 'btn-ctx-nav';
                 viewButton.setAttribute('data-document-name', fileName);
-                viewButton.setAttribute('data-page-number', metadatas["page_counter"]);
+                viewButton.setAttribute('data-page-number', page_number);
                 viewButton.appendChild(viewIcon);
                 cardFooter.appendChild(viewButton);
 
