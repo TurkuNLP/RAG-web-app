@@ -462,7 +462,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
             for (let i = 0; i < newDocs; i++) {
-                addContextElement(data.context[i].replace(/\n/g, "<br>"), data.metadatas[i], storedChunks + i + 1);
+                console.log("data: ", data)
+                addContextElement(data.context[i].replace(/\n/g, "<br>"), data.translates[i].replace(/\n/g, "<br>"), data.metadatas[i], storedChunks + i + 1);
             }
 
             waitForNewContextElementsToLoad(newDocs, storedChunks, () => {
@@ -597,10 +598,11 @@ document.addEventListener("DOMContentLoaded", function() {
     /**
      * Creates and displays a new context element in the right sidebar.
      * @param {string} context - The context content.
+     * @param {string} translation
      * @param {string} metadatas - The metadatas of the chunk.
      * @param {number} contextNumber - The numerical identifier for the context.
      */
-    async function addContextElement(context, metadatas, contextNumber) {
+    async function addContextElement(context, translation, metadatas, contextNumber) {
         
         let fileName = metadatas?.file_name || extractFileNameFromSource(metadatas.source);
         let page_number = metadatas?.page_counter || metadatas.page
@@ -753,7 +755,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body text-white text-justify';
-        cardBody.innerHTML = context;
+
+
+        // Create two divs for translation and context
+        const contextCard = document.createElement('div');
+        contextCard.className = 'context-section-1';
+        contextCard.innerHTML = context;
+
+        const translationCard = document.createElement('div');
+        translationCard.className = 'context-section-2';
+        translationCard.innerHTML = translation;
+
+        // Append the two context sections to the main card body
+        cardBody.appendChild(contextCard);
+        cardBody.appendChild(translationCard);
 
         cardBody.appendChild(cardFooter);
 

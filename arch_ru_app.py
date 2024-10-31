@@ -87,6 +87,7 @@ def get_Chat_response(query):
     output = jsonify({
         'response': res['result'],
         'context': res['context'],
+        'translates': res['translate'],
         'metadatas': res['metadatas']
     })
     return output

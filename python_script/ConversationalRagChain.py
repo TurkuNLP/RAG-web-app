@@ -1,11 +1,11 @@
-from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.output_parsers import YamlOutputParser
-from langchain_core.messages import HumanMessage
 from typing import List, Dict, Any, Optional
 from langchain.callbacks.manager import CallbackManagerForChainRun, Callbacks
 from langchain.llms.base import BaseLanguageModel
 from pydantic import BaseModel
+from langdetect import detect
+from deep_translator import GoogleTranslator
 
 from langchain_core.runnables import RunnableBinding
 
@@ -25,6 +25,7 @@ class ConversationalRagChain(Chain):
     input_key: str = "query"
     output_key: str = "result"
     context_key: str = "context"
+    translate_key: str = "translate"
     metadatas_key: str = "metadatas"
 
     chat_history = []
@@ -71,6 +72,31 @@ class ConversationalRagChain(Chain):
             response = response[marker_index + len(end_marker):].strip()
         return response
 
+    def translate_with_llm(self, text: str, target_language: str = "English") -> str:
+        """Use the LangChain model to translate text."""
+
+        prompt = f"Translate the following text to {target_language}:\n\n{text}"
+        translation = self.llm(prompt)
+        return translation
+    
+    @staticmethod
+    def translate_text(text: str, max_chars: int = 5000) -> str:
+        """Translate text from Russian to English in chunks if it exceeds max_chars."""
+        translator = GoogleTranslator(source="ru", target="en")
+        
+        # If text is within limit, translate directly
+        if len(text) <= max_chars:
+            return translator.translate(text)
+        
+        # Otherwise, split the text into chunks and translate each chunk
+        translated_chunks = []
+        for i in range(0, len(text), max_chars):
+            chunk = text[i:i + max_chars]
+            translated_chunks.append(translator.translate(chunk))
+        
+        # Combine translated chunks
+        return ' '.join(translated_chunks)
+
     def format_outputs(self, output: Dict[str, Any]):
         """Removes the prompt from the generated response
         Regroups the contexts and metadatas of different documents in dedicated lists."""
@@ -88,9 +114,15 @@ class ConversationalRagChain(Chain):
             
         documents = output['context']
         contexts = []
+        translates = []
         metadatas = []
         for doc in documents:
             contexts.append(doc.page_content)
+            detected_lang = detect(doc.page_content)
+
+            # Translate using the LangChain model if not in English
+            if detected_lang != "en":
+                translates.append(self.translate_text(doc.page_content))
             try:
                 metadatas.append(doc.metadata)
             except:
@@ -98,7 +130,7 @@ class ConversationalRagChain(Chain):
                 # TODO Delete this section when alla databases will be updated
                 print("Conflict version between new and last metadata storage in the database")
                 print("You have to update the database")
-        return answer,contexts,metadatas
+        return answer, contexts, translates, metadatas
 
     def update_chat_history(self, user_question, bot_response):
         """Update the chat history"""
@@ -115,10 +147,10 @@ class ConversationalRagChain(Chain):
         question = inputs[self.input_key]
 
         output = self.rag_chain.invoke({"input": question, "chat_history": chat_history})
-        answer,contexts,metadatas = self.format_outputs(output)
+        answer, contexts, translates, metadatas = self.format_outputs(output)
 
         if not contexts:
             answer = "No context found, try rephrasing your question"
             
         self.update_chat_history(question, answer) 
-        return {self.output_key: answer, self.context_key: contexts, self.metadatas_key: metadatas}
+        return {self.output_key: answer, self.context_key: contexts, self.translate_key:translates, self.metadatas_key: metadatas}
