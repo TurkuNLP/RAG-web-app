@@ -127,6 +127,15 @@
   padding-top: 0.5rem;
 }
 
+.highlight-section {
+  background-color: var(--primary-color-light); /* Light primary color for background */
+  border: 2px solid var(--primary-color); /* Primary color for the border */
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold; /* Make text bolder */
+  color: var(--white); /* White text color for good contrast */
+}
+
 /* PDF display and buttons */
 
 .pdf-viewer {

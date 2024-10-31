@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let resizeTimeout;
     let searchNumber = 0;
     let storedChunks = 0;
+    let initialWidth = window.innerWidth;
 
     /**
      * Initializes the main settings and elements when the page is loaded.
@@ -463,7 +464,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             for (let i = 0; i < newDocs; i++) {
                 console.log("data: ", data)
-                addContextElement(data.context[i].replace(/\n/g, "<br>"), data.translates[i].replace(/\n/g, "<br>"), data.metadatas[i], storedChunks + i + 1);
+                addContextElement(data.context[i].replace(/\n/g, "<br>"), data.translates[i], data.metadatas[i], storedChunks + i + 1);
             }
 
             waitForNewContextElementsToLoad(newDocs, storedChunks, () => {
@@ -759,12 +760,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Create two divs for translation and context
         const contextCard = document.createElement('div');
-        contextCard.className = 'context-section-1';
+        contextCard.className = 'context-section';
         contextCard.innerHTML = context;
 
         const translationCard = document.createElement('div');
-        translationCard.className = 'context-section-2';
-        translationCard.innerHTML = translation;
+        translationCard.className = 'translation-section highlight-section';
+
+        // Add the title element
+        const translationTitle = document.createElement('h5');
+        translationTitle.innerText = 'Auto-translated text';
+        translationTitle.style.marginBottom = '10px'; // Optional: add space below the title
+
+        // Append the title and content to the translation card
+        translationCard.appendChild(translationTitle);
+        translationCard.appendChild(document.createTextNode(translation));
 
         // Append the two context sections to the main card body
         cardBody.appendChild(contextCard);

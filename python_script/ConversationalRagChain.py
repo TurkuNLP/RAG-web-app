@@ -123,6 +123,8 @@ class ConversationalRagChain(Chain):
             # Translate using the LangChain model if not in English
             if detected_lang != "en":
                 translates.append(self.translate_text(doc.page_content))
+            else:
+                translates.append("No Translation")
             try:
                 metadatas.append(doc.metadata)
             except:
