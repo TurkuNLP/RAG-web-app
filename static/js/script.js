@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
      * Initializes the main settings and elements when the page is loaded.
      */
     function init() {
-        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 0.5, 'openai', 'gpt-3.5-turbo');
+        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 0.5, 'voyage-multilingual-2', 'gpt-3.5-turbo');
         clearChatHistory(true);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
