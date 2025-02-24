@@ -2,9 +2,12 @@ import openai
 import json
 import re
 import os
+import numpy as np
 
-# OpenAI API key (Replace with your key)
 api_key = os.environ["OPENAI_API_KEY"]
+SOURCE = "data/documents/ship_processed/md-ref"
+OUT_DIR = "data/documents/ship_processed/QA"
+API_LIMIT = 8000 # Just to be safe, original MAX is 12800 
 
 def get_chunks(sections):
 
@@ -18,8 +21,15 @@ def get_chunks(sections):
             current_chunk += "\n\n" + section  # Merge with previous chunk
         else:
             if len(current_chunk) > token_limit:
-                chunks.append(current_chunk.strip())  # Store completed chunk
-                current_chunk = section  # Start a new chunk
+                if len(current_chunk) < API_LIMIT:
+                    chunks.append(current_chunk.strip())  # Store completed chunk
+                    current_chunk = section  # Start a new chunk
+                else:
+                    start = 0
+                    for ch in range(0,len(current_chunk),API_LIMIT):
+                        chunks.append(current_chunk[start:ch])
+                        start = ch
+                    current_chunk = section
             else:
                 current_chunk += "\n\n" + section  # Append to current chunk
 
@@ -64,10 +74,7 @@ def generate_qa(text_chunk):
 
     return json.loads(response.choices[0].message.content)
 
-def main():
-
-    # Load the Markdown file
-    file_path = "data/documents/ship_processed/md-ref/216(82)_Amendments to SOLAS-with-image-refs.md"
+def process_file(file_path):
 
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
@@ -77,9 +84,18 @@ def main():
     sections = ["## " + sec.strip() for sec in sections if sec.strip()]
 
     text_chunks = get_chunks(sections)
+
+    # Determine how many chunks to sample
+    total_chunks = len(text_chunks)
+    num_samples = min(10, max(3, total_chunks // 10))  # At least 3, at most 10
+
+    # Select `num_samples` chunks evenly spaced across the document
+    selected_indices = np.linspace(0, total_chunks - 1, num_samples, dtype=int)
+    sampled_chunks = [text_chunks[i] for i in selected_indices]
+
     # Generate QA pairs from each chunk
     qa_pairs = []
-    for chunk in text_chunks[:50]:  # Limit batch size for testing
+    for chunk in sampled_chunks:
         try:
             qa = generate_qa(chunk)
             qa_pairs.append({"question": qa["question"], "answer": qa["answer"]})
@@ -87,11 +103,21 @@ def main():
             print(f"Error processing chunk: {str(e)}")
 
     # Save to JSONL format
-    qa_corpus_path = "generated_qa_corpus.jsonl"
-    with open(qa_corpus_path, "w", encoding="utf-8") as jsonl_file:
+    qa_corpus = "qa.jsonl"
+    file_name = os.path.splitext(os.path.basename(file_path))[0]
+    with open(os.path.join(OUT_DIR, f"{file_name}-{qa_corpus}"), "w", encoding="utf-8") as jsonl_file:
         for qa in qa_pairs:
             jsonl_file.write(json.dumps(qa, ensure_ascii=False) + "\n")
 
-    print(f"QA corpus saved at {qa_corpus_path}")
+    print(f"QA corpus saved at ", os.path.join(OUT_DIR, f"{file_name}-{qa_corpus}"))
 
+
+def main():
+
+    for filename in os.listdir(SOURCE):
+        if not filename.endswith(".md"):
+            continue
+        file_path = os.path.join(SOURCE, filename)
+        process_file(file_path)
+    
 main()
