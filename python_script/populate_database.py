@@ -7,6 +7,7 @@ import faiss
 from typing import List
 from pathlib import Path
 import logging
+import pandas as pd
 
 from get_embedding_function import get_embedding_function
 
@@ -14,6 +15,7 @@ from langchain.schema.document import Document
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain.document_loaders.pdf import PDFPlumberLoader
 from llama_index.core import SimpleDirectoryReader
+from llama_index.readers.file import PandasCSVReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
@@ -83,7 +85,7 @@ def add_to_database(chunks: list[Document]):
 
     # Only add documents that don't exist in the DB.
     new_chunks = [chunk for chunk in chunks_with_ids if chunk.metadata["id"] not in existing_ids]
-    batch_size = 1000
+    batch_size = 64
 
     if new_chunks:
         with tqdm(total=len(new_chunks), desc="Adding chunks") as pbar:
@@ -122,6 +124,45 @@ def load_documents():
         for doc in tqdm(llama_document_loader.load_data(), desc="TXT/DOCX loaded"):
             doc.metadata.pop('file_path',None)
             llama_documents.append(doc)
+
+        # 2) XLSX (multiple files)
+        xlsx_paths = list(Path(DATA_PATH).glob("**/*.xlsx"))
+
+        for path in tqdm(xlsx_paths, desc="XLSX loaded"):
+            # Read all sheets at once; returns dict[str, DataFrame]
+            # Requires: pip install openpyxl
+            try:
+                sheets = pd.read_excel(path, sheet_name=None, dtype=str, engine="openpyxl")
+            except Exception as e:
+                print(f"Skipped {path.name}: {e}")
+                continue
+
+            if not sheets:
+                print(f"Skipped {path.name}: no sheets found")
+                continue
+
+            for sheet_name, df in sheets.items():
+                # If the sheet is empty, skip gracefully
+                if df is None or df.shape[0] == 0 and df.shape[1] == 0:
+                    continue
+
+                # Convert the sheet to text. CSV-like is compact and readable.
+                # (You could use df.to_string(index=False) if you prefer table formatting.)
+                text = df.to_csv(index=False)
+
+                doc = Document(
+                    page_content=text,
+                    metadata={
+                        "source": str(path),
+                        "workbook": path.name,
+                        "sheet": sheet_name,
+                        "ext": ".xlsx",
+                    },
+                )
+                # Mirror your metadata cleanup
+                doc.metadata.pop('file_path', None)
+                langchain_documents.append(doc)
+
     except ValueError as e:
         print(e)
 
