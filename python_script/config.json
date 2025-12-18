@@ -9,7 +9,7 @@
       "data_path": "data/documents/ship_data",
       "database_root_path": "data/database/ship",
       "embedding_model": "openai",
-      "llm_model": "gpt-3.5-turbo"
+      "llm_model": "gpt-4o-mini"
     },
     "arch-en": {
       "data_path": "data/documents/arch_data-en",
@@ -27,13 +27,19 @@
       "data_path": "data/documents/test_data",
       "database_root_path": "data/database/test",
       "embedding_model": "openai",
-      "llm_model": "gpt-3.5-turbo"
+      "llm_model": "gpt-4o-mini"
     },
     "news": {
       "data_path": "data/documents/news",
       "database_root_path": "data/database/news",
       "embedding_model": "openai",
       "llm_model": "gpt-3.5-turbo"
+    },
+      "law": {
+      "data_path": "data/documents/law",
+      "database_root_path": "data/database/law",
+      "embedding_model": "openai",
+      "llm_model": "gpt-4o-mini"
     }
   }
   

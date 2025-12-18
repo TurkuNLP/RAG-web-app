@@ -105,6 +105,11 @@ def get_llm_function(model_name = LLM_MODEL):
         from langchain_openai import ChatOpenAI
         model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         return model
+
+    elif model_name == "gpt-4o-mini":
+        from langchain_openai import ChatOpenAI
+        model = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+        return model
     
     else:
         print(f'Model "{model_name}" is not implemented on the system.')

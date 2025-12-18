@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="{{ root }}/static/fonts/fontawesome-all.min.css">
     <link rel="stylesheet" href="{{ root }}/static/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="{{ root }}/static/fonts/fontawesome5-overrides.min.css">
-    <link rel="stylesheet" href="{{ root }}/static/css/base.css">
     <link rel="stylesheet" href="{{ root }}/static/css/chatbox.css">
+    <link rel="stylesheet" href="{{ root }}/static/css/base.css">
     <link rel="stylesheet" href="{{ root }}/static/css/sidebar-common.css">
     <link rel="stylesheet" href="{{ root }}/static/css/sidebar-left.css">
     <link rel="stylesheet" href="{{ root }}/static/css/sidebar-right.css">
@@ -30,7 +30,7 @@
                     <a class="text-white float-start" id="sidebarToggleHolder">
                         <img src="{{ root }}/static/img/menu.svg" alt="menubar" class="icon" id="leftSidebarToggle">
                     </a>
-                    <a class="text-white text-decoration-none" id="title"><strong>NEWS RAG</strong></a>
+                    <a class="text-white text-decoration-none" id="title"><strong>RAG Menu</strong></a>
                 </div>
             </li>
         </div>
@@ -130,7 +130,7 @@
                             <li class="settings-item last-item">
                                 <label for="llmModelDropdown">LLM model:</label>
                                 <select class="form-select" id="llmModelDropdown">
-                                    <option value="gpt-3.5-turbo">ChatGPT 3.5</option>
+                                    <option value="gpt-4o-mini">GPT 4o mini</option>
                                 </select>
                             </li>
                         </div>
@@ -154,7 +154,7 @@
                                 </div>
                             </li>
                             <li class="history-items">
-                                <button class="btn clear-btn" id="clear-btn" type="button"><img src="{{ root }}/static/img/delete.svg"alt="delete" class="icon">Clear Chat History</button>
+                                <button class="btn clear-btn" id="clear-btn" type="button"><img src="{{ root }}/static/img/delete.svg" alt="delete" class="icon">Clear Chat History</button>
                             </li>
                         </div>
                     </div>
