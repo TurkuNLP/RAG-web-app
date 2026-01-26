@@ -1,0 +1,9 @@
+services:
+  rag-web-app:
+    build: .
+    environment:
+      APP_NAME: local
+      PORT: 8000
+      HOST: 0.0.0.0
+    ports:
+      - "8000:8000"
