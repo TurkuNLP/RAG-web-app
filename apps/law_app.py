@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory,
 law_app = Flask(__name__)
 
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'python_script'))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'python_script')))
 from parameters import load_config
 global DATA_PATH
 load_config('law')

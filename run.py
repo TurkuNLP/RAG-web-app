@@ -3,12 +3,12 @@ from importlib import import_module
 
 
 APP_REGISTRY = {
-    "local": {"module": "local_app", "app": "local_app", "init": "init_app", "port": 5000},
-    "seus": {"module": "seus_app", "app": "seus_app", "init": "init_app", "port": 6666},
-    "arch-ru": {"module": "arch_ru_app", "app": "arch_ru_app", "init": "init_app", "port": 6667},
-    "arch-en": {"module": "arch_en_app", "app": "arch_en_app", "init": "init_app", "port": 6668},
-    "news": {"module": "news_app", "app": "news_app", "init": "init_app", "port": 6669},
-    "law": {"module": "law_app", "app": "law_app", "init": "init_app", "port": 6670},
+    "local": {"module": "apps.local_app", "app": "local_app", "init": "init_app", "port": 5000},
+    "seus": {"module": "apps.seus_app", "app": "seus_app", "init": "init_app", "port": 6666},
+    "arch-ru": {"module": "apps.arch_ru_app", "app": "arch_ru_app", "init": "init_app", "port": 6667},
+    "arch-en": {"module": "apps.arch_en_app", "app": "arch_en_app", "init": "init_app", "port": 6668},
+    "news": {"module": "apps.news_app", "app": "news_app", "init": "init_app", "port": 6669},
+    "law": {"module": "apps.law_app", "app": "law_app", "init": "init_app", "port": 6670},
 }
 
 
