@@ -1,7 +1,11 @@
 import os
 import sys
+import time
+import logging
+import json
+import threading
 
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, Response, stream_with_context
 law_app = Flask(__name__)
 
 
@@ -74,20 +78,55 @@ def serve_file(filename):
 def chat():
     data = request.get_json()
     msg = data.get("msg", "")
-    return get_Chat_response(msg)
+    return stream_chat_response(msg)
 
-def get_Chat_response(query):
+def compute_chat_response(query):
+    start_time = time.perf_counter()
+    logging.info("RAG /get start")
     inputs = {
     "query": str(query),
     "chat_history": []
     }
     res = rag_conv._call(inputs)
+    duration_s = time.perf_counter() - start_time
+    logging.info("RAG /get done in %.3fs", duration_s)
 
-    output = jsonify({
+    output = {
         'response': res['result'],
         'context': res['context'],
         'metadatas': res['metadatas']
-    })
+    }
+    return output
+
+def stream_chat_response(query):
+    result = {"done": False, "payload": None}
+
+    def run_query():
+        try:
+            result["payload"] = compute_chat_response(query)
+        except Exception as exc:
+            logging.exception("RAG /get failed")
+            result["payload"] = {
+                "response": f"Server error: {exc}",
+                "context": [],
+                "metadatas": []
+            }
+        result["done"] = True
+
+    thread = threading.Thread(target=run_query, daemon=True)
+    thread.start()
+
+    def generate():
+        while not result["done"]:
+            yield " \n"
+            time.sleep(5)
+        yield json.dumps(result["payload"])
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="application/json",
+        headers={"X-Accel-Buffering": "no"},
+    )
     return output
 
 

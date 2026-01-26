@@ -6,12 +6,19 @@
 }
 
 .chat .chat {
-  max-width: 48rem;
+  max-width: 100%;
+  width: 100%;
   padding-bottom: 1rem;
 }
 
 .chat .chat .h5 {
   align-items: center;
+}
+
+.chat .row > .col-lg-10,
+.chat .row > .col-xl-8 {
+  flex: 0 0 100%;
+  max-width: 100%;
 }
 
 .chat .card {
@@ -119,4 +126,23 @@
 .chat .message.outcoming {
   align-self: flex-end;
   background-color: var(--light-grey);
+}
+
+.chat-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.chat-table th,
+.chat-table td {
+  border: 1px solid #9aa1a8;
+  padding: 0.5rem 0.6rem;
+  vertical-align: top;
+}
+
+.chat-table th {
+  background-color: #e9ecef;
+  font-weight: 600;
 }

@@ -40,7 +40,7 @@ html, body {
 
 /* Small screen conditions */
 .small .sidebar-left {
-  width: 20rem;
+  width: 18rem;
 }
 
 .small .sidebar-right {
@@ -54,16 +54,16 @@ html, body {
 
 /* Medium screen conditions */
 .medium .sidebar-left {
-  width: 20rem;
+  width: 18rem;
 }
 
 .medium .sidebar-right {
-  width: 50vw !important;
+  width: 40vw !important;
 }
 
 .medium {
-  padding-left: 20rem;
-  padding-right: 50vw;
+  padding-left: 18rem;
+  padding-right: 40vw;
 }
 
 .medium.left-sidebar-closed {
@@ -76,16 +76,16 @@ html, body {
 
 /* Large screen conditions */
 .large .sidebar-left {
-  width: 20rem;
+  width: 18rem;
 }
 
 .large .sidebar-right {
-  width: 35vw !important;
+  width: 30vw !important;
 }
 
 .large {
-  padding-left: 20rem;
-  padding-right: 35vw;
+  padding-left: 18rem;
+  padding-right: 30vw;
 }
 
 .large.left-sidebar-closed {

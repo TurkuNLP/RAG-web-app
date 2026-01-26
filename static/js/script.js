@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const historySwitchBtn = document.getElementById('flexSwitchHistory');
     const clearHistoryBtn = document.getElementById('clear-btn');
 
+    const initialWidth = win.innerWidth;
     let rightWasOpen = true;
     let leftWasOpen = true;
     let resizeTimeout;
@@ -43,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
      * Initializes the main settings and elements when the page is loaded.
      */
     function init() {
-        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 0.5, 'openai', 'gpt-3.5-turbo');
+        initializeDefaultSettings('similarity', 5, 80, 5, 25, 5, 0.5, 'openai', 'gpt-4o-mini');
         clearChatHistory(true);
         handleResponsiveClasses();
         collapseSidebarsOnLoad();
@@ -359,7 +360,11 @@ document.addEventListener("DOMContentLoaded", function() {
         const documentData = await getDocument(documentName);
         if (documentData && documentData.url) {
             var url = documentData.url;
-            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+            var pdfjsLib = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
+            if (!pdfjsLib) {
+                console.error('PDF.js is not available.');
+                return;
+            }
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
             let pdfDoc = null,
@@ -389,7 +394,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 });
             }
-            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+            pdfjsLib.getDocument({ url: url, isEvalSupported: false }).promise.then(function(pdfDoc_) {
                 // TODO fix the page system, the one Antonin converted are wrong and need pageNumber+1
                 pdfDoc = pdfDoc_;
                 pageCount = pdfDoc.numPages;
@@ -445,21 +450,35 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     function submitQuery() {
         const userMessage = chatInput.value.trim();
-        chatBox.appendChild(createChatMessageElement(userMessage, "outcoming"));
+        chatBox.appendChild(createChatMessageElement(userMessage, "outcoming", false));
         fetch(`${root}/get`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ msg: userMessage })
-        }).then(response => response.json())
-        .then(data => {
-            chatBox.appendChild(createChatMessageElement(data.response, "incoming"));
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+            return response.json();
+        }).then(data => {
+            const responseText = data && data.response != null ? String(data.response) : "";
+            if (!responseText) {
+                throw new Error('Invalid response payload');
+            }
+            const normalizedResponse = normalizeMarkdownTable(responseText);
+            let renderedResponse = normalizedResponse;
+            if (isMarkdownTable(normalizedResponse)) {
+                renderedResponse = markdownTableToHtml(normalizedResponse);
+            } else if (window.marked) {
+                renderedResponse = window.marked.parse(normalizedResponse);
+            }
+            chatBox.appendChild(createChatMessageElement(renderedResponse, "incoming", true));
             chatBox.scrollTo(0, chatBox.scrollHeight);
 
             addSearchNumberElement();
-            newDocs = data.context.length;
-
+            newDocs = Array.isArray(data.context) ? data.context.length : 0;
 
             for (let i = 0; i < newDocs; i++) {
                 addContextElement(data.context[i].replace(/\n/g, "<br>"), data.metadatas[i], storedChunks + i + 1);
@@ -469,8 +488,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 setupContextCollapseEvents(newDocs, storedChunks);
                 setupCloseEventListener(newDocs, storedChunks);
                 setupViewEventListener(newDocs, storedChunks);
-                storedChunks += newDocs
+                storedChunks += newDocs;
             });
+        }).catch(error => {
+            console.error('Error fetching response:', error);
+            chatBox.appendChild(createChatMessageElement("Sorry, something went wrong while fetching the answer. Please try again.", "incoming", false));
+            chatBox.scrollTo(0, chatBox.scrollHeight);
         });
         chatInput.value = "";
         chatInput.style.height = 'auto';
@@ -578,11 +601,98 @@ document.addEventListener("DOMContentLoaded", function() {
      * @param {string} className - The class name to apply to the list item.
      * @returns {HTMLElement} - The created list item element.
      */
-    function createChatMessageElement(message, className) {
+    function createChatMessageElement(message, className, isHtml) {
         const chatLi = document.createElement("li");
         chatLi.classList.add("message", className);
-        chatLi.innerHTML = message;
+        if (isHtml) {
+            chatLi.innerHTML = message;
+        } else {
+            chatLi.innerHTML = escapeHtml(message).replace(/\n/g, "<br>");
+        }
         return chatLi;
+    }
+
+    /**
+     * Escapes HTML special characters to safely render plain text.
+     * @param {string} value - The raw text value.
+     * @returns {string} - Escaped text.
+     */
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    /**
+     * Normalizes single-line pipe-delimited output into a Markdown table.
+     * @param {string} text - The raw response text.
+     * @returns {string} - Normalized Markdown.
+     */
+    function normalizeMarkdownTable(text) {
+        const raw = String(text || "");
+        if (!raw.includes("|")) return raw;
+        if (!raw.includes("Risk Category") || !raw.includes("Source Document")) return raw;
+
+        const flattened = raw.replace(/\s*\n\s*/g, " ").trim();
+        if (!flattened.startsWith("|")) return raw;
+
+        const cells = flattened.split("|").map(cell => cell.trim()).filter(Boolean);
+        if (cells.length < 5) return raw;
+
+        const cols = 5;
+        const rowCount = Math.floor(cells.length / cols);
+        if (rowCount < 1) return raw;
+
+        const rows = [];
+        const header = cells.slice(0, cols);
+        rows.push(`| ${header.join(" | ")} |`);
+        rows.push(`| ${header.map(() => "---").join(" | ")} |`);
+
+        for (let i = cols; i < rowCount * cols; i += cols) {
+            const row = cells.slice(i, i + cols);
+            rows.push(`| ${row.join(" | ")} |`);
+        }
+        return rows.join("\n");
+    }
+
+    /**
+     * Checks if text matches a Markdown table format.
+     * @param {string} text - The Markdown text.
+     * @returns {boolean} - True if it looks like a table.
+     */
+    function isMarkdownTable(text) {
+        return /\|\s*---/.test(text) && text.trim().startsWith("|");
+    }
+
+    /**
+     * Converts a Markdown table to basic HTML table markup.
+     * @param {string} text - The Markdown table text.
+     * @returns {string} - HTML table markup.
+     */
+    function markdownTableToHtml(text) {
+        const lines = String(text || "").split("\n").filter(Boolean);
+        if (lines.length < 2) return escapeHtml(text);
+
+        const parseRow = (line) =>
+            line.split("|").map(cell => cell.trim()).filter(Boolean);
+
+        const headerCells = parseRow(lines[0]);
+        const bodyLines = lines.slice(2);
+
+        const headerHtml = headerCells
+            .map(cell => `<th>${escapeHtml(cell)}</th>`)
+            .join("");
+
+        const bodyHtml = bodyLines.map(line => {
+            const cells = parseRow(line);
+            const rowHtml = cells.map(cell => `<td>${escapeHtml(cell)}</td>`).join("");
+            return `<tr>${rowHtml}</tr>`;
+        }).join("");
+
+        return `<table class="chat-table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table>`;
     }
 
     /**
