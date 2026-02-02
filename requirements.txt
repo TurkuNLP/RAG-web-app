@@ -154,6 +154,7 @@ packaging==23.2
 pandas==2.2.2
 parso==0.8.4
 pathlib==1.0.1
+pdfplumber
 pexpect==4.9.0
 pillow==10.3.0
 platformdirs==4.2.2
