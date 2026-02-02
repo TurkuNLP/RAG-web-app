@@ -43,6 +43,7 @@ email_validator==2.1.1
 etelemetry==0.3.1
 exceptiongroup==1.2.1
 executing==2.0.1
+faiss-cpu
 fastapi==0.111.0
 fastapi-cli
 filelock==3.14.0
@@ -153,6 +154,7 @@ packaging==23.2
 pandas==2.2.2
 parso==0.8.4
 pathlib==1.0.1
+pdfplumber
 pexpect==4.9.0
 pillow==10.3.0
 platformdirs==4.2.2

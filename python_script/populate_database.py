@@ -172,9 +172,16 @@ def load_documents():
         langchain_documents.append(doc)
 
     documents = langchain_documents + convert_llamaindexdoc_to_langchaindoc(llama_documents)
-    print(f"Loaded {len(langchain_documents)} page{'s' if len(langchain_documents) > 1 else ''} from PDF document{ \
-        's' if len(langchain_documents) > 1 else ''}, {len(llama_documents)} item{'s' \
-            if len(llama_documents) > 1 else ''} from TXT/DOCX document{'s' if len(llama_documents) > 1 else ''}.\nTotal items: {len(documents)}.\n")
+    pdf_pages = len(langchain_documents)
+    txt_items = len(llama_documents)
+    total_items = len(documents)
+    
+    print(
+        f"Loaded {pdf_pages} page{'s' if pdf_pages > 1 else ''} from PDF document"
+        f"{'s' if pdf_pages > 1 else ''}, {txt_items} item{'s' if txt_items > 1 else ''} "
+        f"from TXT/DOCX document{'s' if txt_items > 1 else ''}.\n"
+        f"Total items: {total_items}.\n"
+    )
     return documents
 
 def convert_llamaindexdoc_to_langchaindoc(documents: list[Document]):
