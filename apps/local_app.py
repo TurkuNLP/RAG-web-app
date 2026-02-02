@@ -2,8 +2,7 @@ import os
 import sys
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
-local_app = Flask(__name__)
-
+local_app = Flask(__name__, template_folder="../templates", static_folder="../static",)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'python_script')))
 from parameters import load_config
@@ -14,6 +13,12 @@ from get_llm_function import get_llm_function
 from get_rag_chain import get_rag_chain
 from ConversationalRagChain import ConversationalRagChain
 
+APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # /app
+
+if not os.path.isabs(DATA_PATH):
+    DATA_PATH = os.path.join(APP_ROOT, DATA_PATH)
+if not os.path.isabs(DATABASE_ROOT_PATH):
+    DATABASE_ROOT_PATH = os.path.join(APP_ROOT, DATABASE_ROOT_PATH)
 
 root = ""
 
