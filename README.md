@@ -8,19 +8,19 @@ Follow these steps to set up the project locally:
 
 1. **Clone the repository** (You can use HTTPS too):
    ```bash
-   $ git clone git@github.com:TurkuNLP/RAG-web-app.git
+   git clone git@github.com:TurkuNLP/RAG-web-app.git
 2. **Create a virtual environment** :
    ```bash
-   $ python3 -m venv env
+   python3 -m venv env
 *Note: Replace env with your preferred environment name.*
 
 3. **Activate the virtual environment** :   
    ```bash
-   $ .\env\Scripts\activate
+   source venv/bin/activate
 
 4. **Install dependencies** :   
    ```bash
-   $ pip install -r /path/to/requirements.txt
+   pip install -r /path/to/requirements.txt
 
 ## Run an App (Single Entry Point)
 
