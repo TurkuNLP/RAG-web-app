@@ -49,6 +49,16 @@ docker build -t rag-web-app .
 ```
 
 Run a selected app:
+
+```bash
+docker run --rm \
+  --env-file .env \
+  -v "$PWD:/app" \
+  -w /app \
+  rag-web-app \
+  python python_script/populate_database.py --config local
+```
+
 ```bash
 docker run --rm -p 8000:8000 \
   -e APP_NAME=local \
