@@ -16,7 +16,7 @@ Follow these steps to set up the project locally:
 
 3. **Activate the virtual environment** :   
    ```bash
-   source venv/bin/activate
+   source env/bin/activate
 
 4. **Install dependencies** :   
    ```bash
