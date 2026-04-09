@@ -1,24 +1,17 @@
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
-from langchain.output_parsers import YamlOutputParser
 from langchain_core.messages import HumanMessage
 from typing import List, Dict, Any, Optional
 from langchain.callbacks.manager import CallbackManagerForChainRun, Callbacks
 from langchain.llms.base import BaseLanguageModel
-from pydantic import BaseModel
 
 from langchain_core.runnables import RunnableBinding
 
 from parameters import REPHRASING_PROMPT, STANDALONE_PROMPT, ROUTER_DECISION_PROMPT
 
-class ResultYAML(BaseModel):
-    result: bool
-
-
 class ConversationalRagChain(Chain):
     """Chain that encpsulate RAG application enablingnatural conversations"""
     rag_chain: RunnableBinding
-    yaml_output_parser: YamlOutputParser
     llm: BaseLanguageModel
     
     # input\output parameters
@@ -57,7 +50,6 @@ class ConversationalRagChain(Chain):
         return cls(
             llm=llm,
             rag_chain=rag_chain,
-            yaml_output_parser=YamlOutputParser(pydantic_object=ResultYAML),
             callbacks=callbacks,
             **kwargs,
         )

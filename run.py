@@ -1,6 +1,9 @@
 import os
 from importlib import import_module
 
+from flask import Flask, redirect
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
 
 APP_REGISTRY = {
     "local": {"module": "apps.local_app", "app": "local_app", "init": "init_app", "port": 5000},
@@ -37,10 +40,19 @@ def strtobool(value, default=False):
 def main():
     app_name = os.environ.get("APP_NAME", "local")
     host = os.environ.get("HOST", "0.0.0.0")
-    app, default_port = load_app(app_name)
+    mounted_app, default_port = load_app(app_name)
     port = int(os.environ.get("PORT", default_port))
     debug = strtobool(os.environ.get("DEBUG"), default=False)
-    app.run(host=host, port=port, debug=debug)
+    prefix = f"/{app_name}"
+
+    root_app = Flask(__name__)
+
+    @root_app.route("/")
+    def index():
+        return redirect(prefix)
+
+    root_app.wsgi_app = DispatcherMiddleware(root_app.wsgi_app, {prefix: mounted_app})
+    root_app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == "__main__":

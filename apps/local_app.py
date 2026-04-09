@@ -20,7 +20,7 @@ if not os.path.isabs(DATA_PATH):
 if not os.path.isabs(DATABASE_ROOT_PATH):
     DATABASE_ROOT_PATH = os.path.join(APP_ROOT, DATABASE_ROOT_PATH)
 
-root = ""
+root = "/local"
 
 
 @local_app.route("/")

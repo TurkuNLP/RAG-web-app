@@ -11,7 +11,7 @@ def get_embedding_function(model_name = "voyage"):
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
         
     elif model_name == "openai":
-        from langchain_community.embeddings import OpenAIEmbeddings
+        from langchain_openai import OpenAIEmbeddings
         embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         
     elif model_name == "voyage-2":

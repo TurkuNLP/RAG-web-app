@@ -2,7 +2,7 @@ import os
 import sys
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
-news_app = Flask(__name__)
+news_app = Flask(__name__, template_folder="../templates", static_folder="../static")
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'python_script')))
@@ -14,8 +14,13 @@ from get_llm_function import get_llm_function
 from get_rag_chain import get_rag_chain
 from ConversationalRagChain import ConversationalRagChain
 
+APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-root = "news"
+if not os.path.isabs(DATA_PATH):
+    DATA_PATH = os.path.join(APP_ROOT, DATA_PATH)
+
+
+root = "/news"
 
 @news_app.route("/")
 def index():
@@ -47,7 +52,7 @@ def load_rag(settings = None):
 @news_app.route('/documents', methods=['GET'])
 def list_documents():
     files = os.listdir(news_app.config['UPLOAD_FOLDER'])
-    documents = [{"name": f, "url": f"/{root}/files/{f}", "extension": os.path.splitext(f)[1][1:]} for f in files]
+    documents = [{"name": f, "url": f"{root}/files/{f}", "extension": os.path.splitext(f)[1][1:]} for f in files]
     return jsonify(documents)
 
 
@@ -55,7 +60,7 @@ def list_documents():
 @news_app.route('/documents/<document_name>', methods=['GET'])
 def get_document(document_name):
     files = os.listdir(news_app.config['UPLOAD_FOLDER'])
-    documents = [{"name": f, "url": f"/{root}/files/{f}", "extension": os.path.splitext(f)[1][1:]} for f in files]
+    documents = [{"name": f, "url": f"{root}/files/{f}", "extension": os.path.splitext(f)[1][1:]} for f in files]
     
     document = next((doc for doc in documents if doc["name"] == document_name), None)
     

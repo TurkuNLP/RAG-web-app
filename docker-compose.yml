@@ -1,9 +1,13 @@
 services:
   rag-web-app:
     build: .
+    env_file:
+      - .env
     environment:
-      APP_NAME: local
+      APP_NAME: seus
       PORT: 8000
       HOST: 0.0.0.0
     ports:
       - "8000:8000"
+    volumes:
+      - ./data:/app/data
