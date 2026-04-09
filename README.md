@@ -60,7 +60,10 @@ docker run --rm \
 ```
 
 ```bash
-docker run --rm -p 8000:8000 \
+docker run --rm \
+  --env-file .env \
+  -v "$PWD/data:/app/data" \
+  -p 8000:8000 \
   -e APP_NAME=local \
   -e PORT=8000 \
   rag-web-app
