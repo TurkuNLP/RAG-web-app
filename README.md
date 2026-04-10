@@ -2,6 +2,12 @@
 
 This project focuses on developing a web application that enables private corporations to retrieve documentation. The application allows users to obtain information about variables or techniques used in their technologies through question answering, utilizing Large Language Models (LLMs).
 
+This research was conducted as part of the EU Horizon project SEUS – Smart European Shipbuilding (Grant Agreement No. 101096224), funded by the European Union.
+
+<img width="163.9" height="92.2" alt="image" src="https://github.com/user-attachments/assets/0bed84e9-b9b5-4c6f-bc8f-0f368985e52a" />
+<img width="91" height="92.2" alt="image" src="https://github.com/user-attachments/assets/c48db11e-2623-4f14-abb9-cb8968fbd11b" />
+
+
 ## Getting Started
 
 Follow these steps to set up the project locally:
